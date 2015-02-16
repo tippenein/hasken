@@ -2,11 +2,12 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Main (main) where
 
 import Data.Acid
-import Control.Applicative ((<$>))
+import Control.Applicative ((<$>), (<*>))
 import Control.Monad.Reader (ask)
 import Control.Monad.State (get, put)
 import Data.SafeCopy
@@ -23,10 +24,13 @@ data Document = Document { title :: String
 
 data Database = Database [Document]
 
+instance SafeCopy Document where
+  putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
+  getCopy = contain $ Document <$> safeGet <*> safeGet <*> safeGet
+
 $(deriveSafeCopy 0 'base ''Database)
 
--- Transactions are defined to run in either the 'Update' monad
--- or the 'Query' monad.
+-- Transactions are defined to run in either the 'Update' or 'Query' monad
 addDocument :: Document -> Update Database ()
 addDocument doc = do
   Database documents <- get
