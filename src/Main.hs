@@ -9,36 +9,45 @@ import Control.Applicative ((<$>))
 import Control.Monad.Reader (ask)
 import Control.Monad.State (get, put)
 import Data.SafeCopy
+import Data.Typeable
+import Data.Data
 import System.Environment (getArgs)
 
-type Message = String
-data Database = Database [Message]
+data Document = Document { title :: String
+                         , content :: String
+                         , tags :: [String]
+                         } deriving (Show, Typeable, Data)
+
+data Database = Database [Document]
 
 $(deriveSafeCopy 0 'base ''Database)
 
 -- Transactions are defined to run in either the 'Update' monad
 -- or the 'Query' monad.
-addMessage :: Message -> Update Database ()
-addMessage msg = do
-  Database messages <- get
-  put $ Database (msg:messages)
+addDocument :: Document -> Update Database ()
+addDocument doc = do
+  Database documents <- get
+  put $ Database (doc:documents)
 
-viewMessages :: Int -> Query Database [Message]
-viewMessages limit = do
-  Database messages <- ask
-  return $ take limit messages
+viewDocuments :: Int -> Query Database [Document]
+viewDocuments limit = do
+  Database documents <- ask
+  return $ take limit documents
 
--- This defines @ViewMessage@ and @AddMessage@ for us.
-$(makeAcidic ''Database ['addMessage, 'viewMessages])
+-- This defines @ViewDocuments@ and @AddDocument@ for us.
+$(makeAcidic ''Database ['addDocument, 'viewDocuments])
 
 main :: IO ()
 main = do
   args <- getArgs
-  database <- openLocalStateFrom "store/" (Database ["Welcome to the acid-state database."])
+  database <- openLocalStateFrom "store/" (Database [Document "blub" "blub" ["tag","tag2"]])
   if null args
-  then do messages <- query database (ViewMessages 10)
-          putStrLn "Last 10 messages:"
-          mapM_ putStrLn [ " " ++ message | message <- messages ]
-  else do update database (AddMessage (unwords args))
-          putStrLn "Your message has been added to the database."
+  then do documents <- query database (ViewDocuments 10)
+          putStrLn "Last 10 documents:"
+          mapM_ putStrLn [ show document | document <- documents ]
+  else do update database (AddDocument (buildDocument args))
+          putStrLn "Your document has been added to the database."
+          where
 
+buildDocument :: [String] -> Document
+buildDocument args = undefined
