@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Main (main) where
 
@@ -11,12 +12,14 @@ import Control.Monad.State (get, put)
 import Data.SafeCopy
 import Data.Typeable
 import Data.Data
+import Data.List.Split (splitOn)
+import GHC.Generics
 import System.Environment (getArgs)
 
 data Document = Document { title :: String
                          , content :: String
                          , tags :: [String]
-                         } deriving (Show, Typeable, Data)
+                         } deriving (Show, Typeable, Data, Generic)
 
 data Database = Database [Document]
 
@@ -50,4 +53,9 @@ main = do
           where
 
 buildDocument :: [String] -> Document
-buildDocument args = undefined
+buildDocument args = Document {title = _title, tags = _tags, content = _content}
+  where
+    _title = head args
+    _tags = splitOn "," (head $ tail args)
+    _content = head $ tail args
+
