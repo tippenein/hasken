@@ -13,6 +13,7 @@ import Control.Monad.State (get, put)
 import Data.SafeCopy
 import Data.Typeable
 import Data.Data
+import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
 import GHC.Generics
 import System.Environment (getArgs)
@@ -41,6 +42,17 @@ viewDocuments limit = do
   Database documents <- ask
   return $ take limit documents
 
+searchDocuments :: String -> Query Database [Document]
+searchDocuments query = do
+  Database documents <- ask
+  return $ filter filterDoc documents
+  where
+    filterDoc document =
+      case document of
+        Document a _ _ -> query `isInfixOf` a
+        Document _ b _ -> query `isInfixOf` b
+        Document _ _ cs -> any (query `isInfixOf`) cs
+
 -- This defines @ViewDocuments@ and @AddDocument@ for us.
 $(makeAcidic ''Database ['addDocument, 'viewDocuments])
 
@@ -54,7 +66,6 @@ main = do
           mapM_ putStrLn [ show document | document <- documents ]
   else do update database (AddDocument (buildDocument args))
           putStrLn "Your document has been added to the database."
-          where
 
 buildDocument :: [String] -> Document
 buildDocument args = Document {title = _title, tags = _tags, content = _content}
