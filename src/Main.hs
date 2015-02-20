@@ -3,6 +3,8 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NamedFieldPuns #-}
+
 
 module Main (main) where
 
@@ -48,29 +50,33 @@ searchDocuments query = do
   return $ filter filterDoc documents
   where
     filterDoc document =
-      case document of
-        Document a _ _ -> query `isInfixOf` a
-        Document _ b _ -> query `isInfixOf` b
-        Document _ _ cs -> any (query `isInfixOf`) cs
+      (query `isInfixOf` title document) ||
+      (query `isInfixOf` content document) ||
+      any (isInfixOf query) (tags document)
 
--- This defines @ViewDocuments@ and @AddDocument@ for us.
-$(makeAcidic ''Database ['addDocument, 'viewDocuments])
+-- This defines @ViewDocuments@, @AddDocument@, etc for us
+$(makeAcidic ''Database ['addDocument, 'viewDocuments, 'searchDocuments])
 
 main :: IO ()
 main = do
   args <- getArgs
-  database <- openLocalStateFrom "store/" (Database [Document "blub" "blub" ["tag","tag2"]])
-  if null args
-  then do documents <- query database (ViewDocuments 10)
-          putStrLn "Last 10 documents:"
-          mapM_ putStrLn [ show document | document <- documents ]
-  else do update database (AddDocument (buildDocument args))
-          putStrLn "Your document has been added to the database."
+  database <- openLocalStateFrom "store/" (Database [])
+  case args of
+    [] -> do
+      documents <- query database (ViewDocuments 10)
+      putStrLn "Last 10 documents:"
+      mapM_ putStrLn [ show document | document <- documents ]
+    ["search", q] -> do
+      documents <- query database (SearchDocuments q)
+      putStrLn $ "document query on: " ++ q
+      mapM_ putStrLn [ show document | document <- documents ]
+    _ -> do
+      update database (AddDocument (buildDocument args))
+      putStrLn "Your document has been added to the database."
 
 buildDocument :: [String] -> Document
 buildDocument args = Document {title = _title, tags = _tags, content = _content}
   where
-    _title = head args
-    _tags = splitOn "," (head $ tail args)
+    _title   = head args
+    _tags    = splitOn "," (head $ tail args)
     _content = head $ tail args
-
