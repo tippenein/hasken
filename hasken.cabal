@@ -38,7 +38,7 @@ cabal-version:       >=1.10
 
 executable hasken
   -- .hs or .lhs file containing the Main module.
-  main-is:             src/Main.hs
+  main-is:             Data/Hasken.hs
 
   -- Modules included in this executable, other than Main.
   -- other-modules:
