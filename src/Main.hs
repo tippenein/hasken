@@ -22,9 +22,12 @@ import System.Environment (getArgs)
 data Document = Document { title :: String
                          , content :: String
                          , tags :: [String]
-                         } deriving (Show, Typeable, Data, Generic)
+                         } deriving (Typeable, Data, Generic)
 
 data Database = Database [Document]
+
+instance Show Document where
+  show (Document a b c) = a ++ " - " ++ show b ++ " ~ " ++ show c
 
 instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
