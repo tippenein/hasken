@@ -61,6 +61,7 @@ main = do
   args <- getArgs
   database <- openLocalStateFrom "store/" (Database [])
   case args of
+    ["help"] -> putStrLn usage
     [] -> do
       documents <- query database (ViewDocuments 10)
       putStrLn "Last 10 documents:"
@@ -70,7 +71,7 @@ main = do
       putStrLn $ "document query on: " ++ q
       mapM_ putStrLn [ show document | document <- documents ]
     _ -> do
-      update database (AddDocument (buildDocument args))
+      update database $ AddDocument (buildDocument (tail args))
       putStrLn "Your document has been added to the database."
 
 buildDocument :: [String] -> Document
@@ -78,4 +79,10 @@ buildDocument args = Document {title = _title, tags = _tags, content = _content}
   where
     _title   = head args
     _tags    = splitOn "," (head $ tail args)
-    _content = head $ tail args
+    _content = unwords $ tail $ tail args
+
+usage = unlines [ "usage:"
+                , "  add title tag1,tag2,tag3 content and stuff"
+                , "  search term"
+                , "----"
+                , "no argument gives you the last 10 documents added"]
