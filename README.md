@@ -3,7 +3,7 @@ Hasken
 
 Hasken you shall receive
 
-Easily searchable local document store.
+Easily searchable local document store with option to push to server for backup
 
 use it for:
   - storing links to gifs
@@ -12,6 +12,11 @@ use it for:
   - encrypt it and store your pins and passwords
 
 all tagged and searchable from the commandline
+
+##Goal
+
+This document store should function without an internet connection.
+When a connection is present, it should push new data to a server for backup storage.
 
 ##Setup
 
