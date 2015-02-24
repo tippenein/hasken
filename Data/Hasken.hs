@@ -13,7 +13,6 @@ import Control.Monad.Reader (ask)
 import Control.Monad.State (get, put)
 import Data.SafeCopy
 import Data.Typeable
-import Data.Data
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
 import GHC.Generics
@@ -22,7 +21,7 @@ import System.Environment (getArgs)
 data Document = Document { title :: String
                          , content :: String
                          , tags :: [String]
-                         } deriving (Typeable, Data, Generic)
+                         } deriving (Typeable, Generic)
 
 data Database = Database [Document]
 
