@@ -53,6 +53,7 @@ executable hasken
                      , safecopy
                      , mtl
                      , split
+                     , QuickCheck
 
   -- Directories containing source files.
   -- hs-source-dirs:

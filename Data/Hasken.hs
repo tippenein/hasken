@@ -5,7 +5,11 @@
 {-# LANGUAGE RecordWildCards #-}
 
 
-module Main (main) where
+module Data.Hasken
+  ( main
+  , Document
+  )
+where
 
 import Data.Acid
 import Control.Applicative ((<$>), (<*>))
