@@ -11,16 +11,18 @@ module Data.Hasken
   )
 where
 
-import Data.Acid
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad.Reader (ask)
 import Control.Monad.State (get, put)
-import Data.SafeCopy
-import Data.Typeable
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
+import Data.Acid
+import Data.SafeCopy
+import Data.Typeable
 import GHC.Generics
 import System.Environment (getArgs)
+import System.Posix.Daemonize (serviced)
+import Network.System (syncService)
 
 data Document = Document { title :: String
                          , content :: String
@@ -66,6 +68,7 @@ main :: IO ()
 main = do
   args <- getArgs
   database <- openLocalStateFrom "store/" (Database [])
+  serviced syncService
   case args of
     ["help"] -> putStrLn usage
     [] -> do

@@ -54,6 +54,7 @@ executable hasken
                      , mtl
                      , split
                      , QuickCheck
+                     , hdaemonize
 
   -- Directories containing source files.
   -- hs-source-dirs:
