@@ -54,6 +54,8 @@ executable hasken
                      , mtl
                      , split
                      , QuickCheck
+                     , directory
+                     , filepath
 
   -- Directories containing source files.
   -- hs-source-dirs:

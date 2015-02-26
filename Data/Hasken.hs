@@ -21,6 +21,8 @@ import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
 import GHC.Generics
 import System.Environment (getArgs)
+import System.Directory (getHomeDirectory)
+import System.FilePath (joinPath)
 
 data Document = Document { title :: String
                          , content :: String
@@ -61,6 +63,11 @@ searchDocuments query = do
 
 -- This defines @ViewDocuments@, @AddDocument@, etc for us
 $(makeAcidic ''Database ['addDocument, 'viewDocuments, 'searchDocuments])
+
+storageLocation :: IO FilePath
+storageLocation = do
+  homePath <- getHomeDirectory
+  return $ joinPath [homePath, "hasken_store"]
 
 main :: IO ()
 main = do
