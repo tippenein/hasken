@@ -72,7 +72,8 @@ storageLocation = do
 main :: IO ()
 main = do
   args <- getArgs
-  database <- openLocalStateFrom "store/" (Database [])
+  loc <- storageLocation
+  database <- openLocalStateFrom loc (Database [])
   case args of
     ["help"] -> putStrLn usage
     [] -> do
