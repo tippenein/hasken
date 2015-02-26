@@ -32,7 +32,7 @@ data Document = Document { title :: String
 data Database = Database [Document]
 
 instance Show Document where
-  show (Document a b c) = a ++ " - " ++ show b ++ " ~ " ++ show c
+  show (Document a b c) = a ++ " - " ++ show b
 
 instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
