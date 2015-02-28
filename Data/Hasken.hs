@@ -4,10 +4,13 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 
-
 module Data.Hasken
-  ( main
-  , Document
+  ( Database(..)
+  , Document(..)
+  , ViewDocuments(..)
+  , AddDocument(..)
+  , SearchDocuments(..)
+  , buildDocument
   )
 where
 
@@ -20,9 +23,6 @@ import Data.Typeable
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
 import GHC.Generics
-import System.Environment (getArgs)
-import System.Directory (getHomeDirectory)
-import System.FilePath (joinPath)
 
 data Document = Document { title :: String
                          , content :: String
@@ -64,39 +64,9 @@ searchDocuments query = do
 -- This defines @ViewDocuments@, @AddDocument@, etc for us
 $(makeAcidic ''Database ['addDocument, 'viewDocuments, 'searchDocuments])
 
-storageLocation :: IO FilePath
-storageLocation = do
-  homePath <- getHomeDirectory
-  return $ joinPath [homePath, "hasken_store"]
-
-main :: IO ()
-main = do
-  args <- getArgs
-  loc <- storageLocation
-  database <- openLocalStateFrom loc (Database [])
-  case args of
-    ["help"] -> putStrLn usage
-    [] -> do
-      documents <- query database (ViewDocuments 10)
-      putStrLn "Last 10 documents:"
-      mapM_ putStrLn [ show document | document <- documents ]
-    ["search", q] -> do
-      documents <- query database (SearchDocuments q)
-      putStrLn $ "document query on: " ++ q
-      mapM_ putStrLn [ show document | document <- documents ]
-    _ -> do
-      update database $ AddDocument (buildDocument (tail args))
-      putStrLn "Your document has been added to the database."
-
 buildDocument :: [String] -> Document
 buildDocument args = Document {title = _title, tags = _tags, content = _content}
   where
     _title   = head args
     _tags    = splitOn "," (head $ tail args)
     _content = unwords $ tail $ tail args
-
-usage = unlines [ "usage:"
-                , "  add title tag1,tag2,tag3 content and stuff"
-                , "  search term"
-                , "----"
-                , "no argument gives you the last 10 documents added"]
