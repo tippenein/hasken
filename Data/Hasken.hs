@@ -4,15 +4,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Data.Hasken
-  ( Database(..)
-  , Document(..)
-  , ViewDocuments(..)
-  , AddDocument(..)
-  , SearchDocuments(..)
-  , buildDocument
-  )
-where
+module Data.Hasken where
 
 import Data.Acid
 import Control.Applicative ((<$>), (<*>))
