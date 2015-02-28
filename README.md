@@ -23,10 +23,10 @@ When a connection is present, it should push new data to a server for backup sto
 within the sandbox
 `cabal configure; cabal build; cabal install`
 
-global package install
-`cabal install`
-`runhaskell Setup.hs configure`
+user package install (puts binary in `~/.cabal/bin`)
+`runhaskell Setup.hs configure --user`
 `runhaskell Setup.hs build`
+`runhaskell Setup.hs install`
 
 search for something
 `./hasken search query`
