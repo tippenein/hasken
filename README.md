@@ -9,7 +9,7 @@ use it for:
   - storing links to gifs
   - recipes
   - notes
-  - encrypt it and store your pins and passwords
+  - store your pins and passwords (once clientside encryption is implemented)
 
 all tagged and searchable from the commandline
 
@@ -24,9 +24,9 @@ within the sandbox
 `cabal configure; cabal build; cabal install`
 
 user package install (puts binary in `~/.cabal/bin`)
-`runhaskell Setup.hs configure --user`
-`runhaskell Setup.hs build`
-`runhaskell Setup.hs install`
+- `runhaskell Setup.hs configure --user`
+- `runhaskell Setup.hs build`
+- `runhaskell Setup.hs install`
 
 search for something
 `./hasken search query`
