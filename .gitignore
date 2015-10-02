@@ -1,4 +1,5 @@
 .cabal-sandbox*
+tags
 .stack-work/
 dist/*
 *.hi

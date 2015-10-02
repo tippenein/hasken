@@ -20,19 +20,13 @@ When a connection is present, it should push new data to a server for backup sto
 
 ##Setup
 
-within the sandbox
-`cabal configure; cabal build; cabal install`
-
-user package install (puts binary in `~/.cabal/bin`)
-- `runhaskell Setup.hs configure --user`
-- `runhaskell Setup.hs build`
-- `runhaskell Setup.hs install`
+`stack install`
 
 search for something
-`./hasken search query`
+`hasken search query`
 
 add something
-`./hasken add title tag1,tag2,tag3 content blah blah blah`
+`hasken add title tag1,tag2,tag3 content blah blah blah`
 
 list the last 10 docs
-`./hasken`
+`hasken`
