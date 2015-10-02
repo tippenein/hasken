@@ -1,27 +1,27 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE RecordWildCards    #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
 
 module Main where
 
-import Data.Acid
-import Control.Applicative ((<$>), (<*>))
+import Control.Applicative  ((<$>), (<*>))
 import Control.Monad.Reader (ask)
-import Control.Monad.State (get, put)
+import Control.Monad.State  (get, put)
+import Data.Acid
+import Data.List            (isInfixOf)
+import Data.List.Split      (splitOn)
 import Data.SafeCopy
 import Data.Typeable
-import Data.List (isInfixOf)
-import Data.List.Split (splitOn)
 import GHC.Generics
-import System.Environment (getArgs)
-import System.Directory (getHomeDirectory)
-import System.FilePath (joinPath)
+import System.Directory     (getHomeDirectory)
+import System.Environment   (getArgs)
+import System.FilePath      (joinPath)
 
-data Document = Document { title :: String
+data Document = Document { title   :: String
                          , content :: String
-                         , tags :: [String]
+                         , tags    :: [String]
                          } deriving (Typeable, Generic)
 
 data Database = Database [Document]
