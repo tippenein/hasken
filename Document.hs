@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE OverloadedStrings  #-}
 {-# LANGUAGE RecordWildCards    #-}
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE TypeFamilies       #-}
@@ -14,14 +15,15 @@ import Data.Acid
 import Data.List            (isInfixOf)
 import Data.List.Split      (splitOn)
 import Data.SafeCopy
+import Data.Text
 import Data.Typeable
 import GHC.Generics
 
 data Database = Database [Document]
 
-data Document = Document { title   :: String
-                         , content :: String
-                         , tags    :: [String]
+data Document = Document { title   :: Text
+                         , content :: Text
+                         , tags    :: [Text]
                          } deriving (Typeable, Generic)
 
 instance Show Document where
@@ -44,7 +46,7 @@ viewDocuments limit = do
   Database documents <- ask
   return $ take limit documents
 
-searchDocuments :: String -> Query Database [Document]
+searchDocuments :: Text -> Query Database [Document]
 searchDocuments query = do
   Database documents <- ask
   return $ filter filterDoc documents
@@ -55,7 +57,7 @@ searchDocuments query = do
       any (isInfixOf query) (tags document)
 
 
-buildDocument :: [String] -> Document
+buildDocument :: [Text] -> Document
 buildDocument args = Document {title = _title, tags = _tags, content = _content}
   where
     _title   = head args
