@@ -11,13 +11,16 @@ import System.Environment      (getArgs, getEnv)
 import System.FilePath         (joinPath)
 import Text.PrettyPrint.Leijen (text)
 
+$(makeAcidic ''Database [
+  'addDocument,
+  'viewDocuments,
+  'searchDocuments
+  ])
+
 storageLocation :: IO FilePath
 storageLocation = do
   homePath <- getHomeDirectory
   return $ joinPath [homePath, ".hasken_store"]
-
-
--- This defines @ViewDocuments@, @AddDocument@, etc for us
 
 display :: [Document] -> IO ()
 display = mapM_ print

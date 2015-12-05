@@ -70,9 +70,3 @@ buildDocument args = Document {title = _title, tags = _tags, content = _content}
 
 $(deriveSafeCopy 0 'base ''Database)
 
-$(makeAcidic ''Database [
-  'addDocument,
-  'viewDocuments,
-  'searchDocuments
-  ])
-
