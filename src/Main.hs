@@ -43,14 +43,15 @@ main = do
       putStrLn $ "document query on: " ++ q
       display documents
     ["delete"] -> deletePrompt
-    _ -> do
+    [] -> do
       putStrLn "Last 10 documents:"
       documents <- query database (ViewDocuments 10)
       display documents
+    _  -> putStrLn usage
 
 usage = unlines [ "usage:"
                 , "  add title tag1,tag2,tag3 content and stuff"
-                , "  search term"
+                , "  search <term>"
                 , "----"
                 , "no argument gives you the last 10 documents added"]
 
