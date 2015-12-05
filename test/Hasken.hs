@@ -1,6 +1,6 @@
 module Hasken (spec) where
 
-import Data.Hasken     (Document)
+import Hasken          (Document)
 
 import Test.QuickCheck (Arbitrary (..), Gen, choose, elements, oneof)
 

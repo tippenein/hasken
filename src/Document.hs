@@ -23,7 +23,7 @@ data Database = Database [Document]
 data Document = Document { title   :: String
                          , content :: String
                          , tags    :: [String]
-                         } deriving (Typeable, Generic)
+                         } deriving (Eq, Ord, Typeable, Generic)
 
 instance Show Document where
   show (Document a b c) = a ++ " - " ++ show b
@@ -32,13 +32,18 @@ instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
   getCopy = contain $ Document <$> safeGet <*> safeGet <*> safeGet
 
-$(deriveSafeCopy 0 'base ''Database)
 
 -- Transactions are defined to run in either the 'Update' or 'Query' monad
 addDocument :: Document -> Update Database ()
 addDocument doc = do
   Database documents <- get
   put $ Database (doc:documents)
+
+removeDocument :: Document -> Update Database ()
+removeDocument doc = do
+  Database documents <- get
+  let withoutDoc = filter (\d -> d /= doc) documents
+  put $ Database withoutDoc
 
 viewDocuments :: Int -> Query Database [Document]
 viewDocuments limit = do
@@ -62,4 +67,12 @@ buildDocument args = Document {title = _title, tags = _tags, content = _content}
     _title   = head args
     _tags    = splitOn "," (head $ tail args)
     _content = unwords $ tail $ tail args
+
+$(deriveSafeCopy 0 'base ''Database)
+
+$(makeAcidic ''Database [
+  'addDocument,
+  'viewDocuments,
+  'searchDocuments
+  ])
 
