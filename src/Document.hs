@@ -5,7 +5,6 @@
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE TypeFamilies       #-}
 
-
 module Document where
 
 import Control.Applicative  ((<$>), (<*>))
@@ -15,15 +14,15 @@ import Data.Acid
 import Data.List            (isInfixOf)
 import Data.List.Split      (splitOn)
 import Data.SafeCopy
-import Data.Text
+import Data.Text            (Text)
 import Data.Typeable
 import GHC.Generics
 
 data Database = Database [Document]
 
-data Document = Document { title   :: Text
-                         , content :: Text
-                         , tags    :: [Text]
+data Document = Document { title   :: String
+                         , content :: String
+                         , tags    :: [String]
                          } deriving (Typeable, Generic)
 
 instance Show Document where
@@ -46,7 +45,7 @@ viewDocuments limit = do
   Database documents <- ask
   return $ take limit documents
 
-searchDocuments :: Text -> Query Database [Document]
+searchDocuments :: String -> Query Database [Document]
 searchDocuments query = do
   Database documents <- ask
   return $ filter filterDoc documents
@@ -57,9 +56,10 @@ searchDocuments query = do
       any (isInfixOf query) (tags document)
 
 
-buildDocument :: [Text] -> Document
+buildDocument :: [String] -> Document
 buildDocument args = Document {title = _title, tags = _tags, content = _content}
   where
     _title   = head args
     _tags    = splitOn "," (head $ tail args)
     _content = unwords $ tail $ tail args
+

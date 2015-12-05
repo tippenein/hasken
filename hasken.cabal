@@ -10,8 +10,7 @@ bug-reports:         https://github.com/tippenein/hasken/issues
 author:              brady.ouren
 maintainer:          brady.ouren@gmail.com
 copyright:           2015 brady.ouren <brady.ouren@gmail.com>
-extra-source-files:
-  README.md
+extra-source-files:  README.md
 
 source-repository head
   type:     git
@@ -29,6 +28,7 @@ executable hasken
     , safecopy
     , split
     , directory
+    , text
     , filepath
   default-language:    Haskell2010
 

@@ -4,11 +4,11 @@
 module Main where
 
 import Data.Acid
+import Data.Maybe         (fromMaybe)
 import Document
 import System.Directory   (getHomeDirectory)
-import System.Environment (getArgs)
+import System.Environment (getArgs, getEnv)
 import System.FilePath    (joinPath)
-
 
 storageLocation :: IO FilePath
 storageLocation = do
@@ -16,7 +16,17 @@ storageLocation = do
   return $ joinPath [homePath, "hasken_store"]
 
 -- This defines @ViewDocuments@, @AddDocument@, etc for us
-$(makeAcidic ''Database ['addDocument, 'viewDocuments, 'searchDocuments])
+$(makeAcidic ''Database [
+  'addDocument,
+  'viewDocuments,
+  'searchDocuments
+  ])
+
+display :: [Document] -> IO ()
+display = mapM_ print
+
+deletePrompt :: IO ()
+deletePrompt = putStrLn "asdf"
 
 main :: IO ()
 main = do
@@ -25,18 +35,18 @@ main = do
   database <- openLocalStateFrom loc (Database [])
   case args of
     ["help"] -> putStrLn usage
-    [] -> do
-      documents <- query database (ViewDocuments 10)
-      putStrLn "Last 10 documents:"
-      mapM_ putStrLn [ show document | document <- documents ]
+    ["add", title, tags, content] -> do
+      update database $ AddDocument (buildDocument [title, tags, content])
+      putStrLn "Your document has been added to the database."
     ["search", q] -> do
       documents <- query database (SearchDocuments q)
       putStrLn $ "document query on: " ++ q
-      mapM_ putStrLn [ show document | document <- documents ]
+      display documents
+    ["delete"] -> deletePrompt
     _ -> do
-      update database $ AddDocument (buildDocument (tail args))
-      putStrLn "Your document has been added to the database."
-
+      putStrLn "Last 10 documents:"
+      documents <- query database (ViewDocuments 10)
+      display documents
 
 usage = unlines [ "usage:"
                 , "  add title tag1,tag2,tag3 content and stuff"
