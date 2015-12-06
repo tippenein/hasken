@@ -4,12 +4,11 @@
 module Main where
 
 import Data.Acid
-import Data.Maybe              (fromMaybe)
+import Data.Maybe         (fromMaybe)
 import Document
-import System.Directory        (getHomeDirectory)
-import System.Environment      (getArgs, getEnv)
-import System.FilePath         (joinPath)
-import Text.PrettyPrint.Leijen (text)
+import System.Directory   (getHomeDirectory)
+import System.Environment (getArgs, getEnv)
+import System.FilePath    (joinPath)
 
 $(makeAcidic ''Database [
   'addDocument,
@@ -22,11 +21,10 @@ storageLocation = do
   homePath <- getHomeDirectory
   return $ joinPath [homePath, ".hasken_store"]
 
-display :: [Document] -> IO ()
-display = mapM_ print
-
 deletePrompt :: IO ()
 deletePrompt = putStrLn "asdf"
+
+display = mapM_ displayDoc
 
 main :: IO ()
 main = do

@@ -7,16 +7,17 @@
 
 module Document where
 
-import Control.Applicative  ((<$>), (<*>))
-import Control.Monad.Reader (ask)
-import Control.Monad.State  (get, put)
+import Control.Applicative     ((<$>), (<*>))
+import Control.Monad.Reader    (ask)
+import Control.Monad.State     (get, put)
 import Data.Acid
-import Data.List            (isInfixOf)
-import Data.List.Split      (splitOn)
+import Data.List               (isInfixOf)
+import Data.List.Split         (splitOn)
 import Data.SafeCopy
-import Data.Text            (Text)
+import Data.Text               (Text)
 import Data.Typeable
 import GHC.Generics
+import Text.PrettyPrint.Leijen (linebreak, putDoc, text, (<+>))
 
 data Database = Database [Document]
 
@@ -25,8 +26,14 @@ data Document = Document { title   :: String
                          , tags    :: [String]
                          } deriving (Eq, Ord, Typeable, Generic)
 
+displayDoc d = putDoc $
+  text (title d) <+>
+  text "->" <+>
+  text (content d) <+>
+  linebreak
+
 instance Show Document where
-  show (Document a b c) = a ++ " - " ++ show b
+  show (Document a b c) = a ++ " - " ++ b
 
 instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
@@ -42,7 +49,7 @@ addDocument doc = do
 removeDocument :: Document -> Update Database ()
 removeDocument doc = do
   Database documents <- get
-  let withoutDoc = filter (\d -> d /= doc) documents
+  let withoutDoc = filter (/= doc) documents
   put $ Database withoutDoc
 
 viewDocuments :: Int -> Query Database [Document]
