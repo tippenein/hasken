@@ -19,7 +19,7 @@ $(makeAcidic ''Database [
 storageLocation :: IO FilePath
 storageLocation = do
   homePath <- getHomeDirectory
-  return $ joinPath [homePath, ".hasken_store"]
+  return (joinPath [homePath, ".hasken_store"])
 
 deletePrompt :: IO ()
 deletePrompt = putStrLn "asdf"
@@ -34,11 +34,12 @@ main = do
   case args of
     ["help"] -> putStrLn usage
     ["add", title, tags, content] -> do
-      update database $ AddDocument (buildDocument [title, tags, content])
+      let newDoc = buildDocument $ [title, tags, content]
+      update database (AddDocument newDoc)
       putStrLn "Your document has been added to the database."
     ["search", q] -> do
       documents <- query database (SearchDocuments q)
-      putStrLn $ "document query on: " ++ q
+      putStrLn ("document query on: " ++ q)
       display documents
     ["delete"] -> deletePrompt
     [] -> do

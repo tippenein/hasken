@@ -26,14 +26,15 @@ data Document = Document { title   :: String
                          , tags    :: [String]
                          } deriving (Eq, Ord, Typeable, Generic)
 
-displayDoc d = putDoc $
+displayDoc d = putDoc (
   text (title d) <+>
   text "->" <+>
   text (content d) <+>
   linebreak
+  )
 
 instance Show Document where
-  show (Document a b c) = a ++ " - " ++ b
+  show (Document title content tags) = title ++ " - " ++ content
 
 instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
@@ -50,17 +51,17 @@ removeDocument :: Document -> Update Database ()
 removeDocument doc = do
   Database documents <- get
   let withoutDoc = filter (/= doc) documents
-  put $ Database withoutDoc
+  put (Database withoutDoc)
 
 viewDocuments :: Int -> Query Database [Document]
 viewDocuments limit = do
   Database documents <- ask
-  return $ take limit documents
+  return (take limit documents)
 
 searchDocuments :: String -> Query Database [Document]
 searchDocuments query = do
   Database documents <- ask
-  return $ filter filterDoc documents
+  return (filter filterDoc documents)
   where
     filterDoc document =
       (query `isInfixOf` title document) ||
@@ -72,8 +73,14 @@ buildDocument :: [String] -> Document
 buildDocument args = Document {title = _title, tags = _tags, content = _content}
   where
     _title   = head args
-    _tags    = splitOn "," (head $ tail args)
-    _content = unwords $ tail $ tail args
+    _tags    = splitOn "," (second args)
+    _content = unwords (thirdAndOn args)
+
+thirdAndOn :: [String] -> [String]
+thirdAndOn args = tail (tail args)
+
+second :: [String] -> String
+second ds = head (tail ds)
 
 $(deriveSafeCopy 0 'base ''Database)
 
