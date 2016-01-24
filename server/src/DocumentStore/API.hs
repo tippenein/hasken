@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
-module DocumentStore.API () where
+module DocumentStore.API where
 
 import Data.Proxy
 import Servant.API
@@ -12,7 +12,17 @@ documentAPI = Proxy
 
 type DocumentAPI =
        ListDocuments
-  :<|> ShowDocument
+  :<|> CreateDocument
+
+type ListDocuments =
+     "documents"
+  :> Get '[JSON] DocumentResponse
+
+type CreateDocument =
+     "documents"
+  :> ReqBody '[JSON] Document
+  :> Post '[JSON] Document
+
 
 -- separate definitions of each route will go here
 -- for example:

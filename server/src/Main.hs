@@ -9,7 +9,7 @@ import DocumentStore.Server (runServer)
 -- | Main application init
 main :: IO ()
 main = do
-  let port = 8081 :: Int
+  let port = 8082 :: Int
   putStrLn ("Starting on port " ++ show port ++ "...")
   Exception.catch
     (runServer port)
