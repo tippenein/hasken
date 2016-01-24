@@ -1,21 +1,21 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 
-module DocumentStore.Types where
+module Remote.Types where
 
 import Data.Aeson
-import Data.Text
-import GHC.Generics
-import Data.Typeable
 import Data.SafeCopy
+import Data.Text
+import Data.Typeable
+import GHC.Generics
 
 data Document = Document {
-    title :: Text
+    title   :: Text
   , content :: Text
-  , tags :: [Text]
+  , tags    :: [Text]
   } deriving (Show, Eq, ToJSON, FromJSON, Generic)
 
 instance SafeCopy Document where

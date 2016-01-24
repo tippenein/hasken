@@ -1,11 +1,11 @@
 {-# LANGUAGE DataKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
-module DocumentStore.API where
+module Remote.API where
 
 import Data.Proxy
+import Remote.Types
 import Servant.API
-import DocumentStore.Types
 
 documentAPI :: Proxy DocumentAPI
 documentAPI = Proxy

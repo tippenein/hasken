@@ -3,12 +3,15 @@
 
 module Main where
 
-import Data.Acid
-import Data.Maybe         (fromMaybe)
-import Document
-import System.Directory   (getHomeDirectory)
-import System.Environment (getArgs, getEnv)
-import System.FilePath    (joinPath)
+import           Data.Acid
+import           Data.Maybe         (fromMaybe)
+import           Document
+import           System.Directory   (getHomeDirectory)
+import           System.Environment (getArgs, getEnv)
+import           System.FilePath    (joinPath)
+
+import qualified Control.Exception  as Exception
+import           Remote.Server      (runServer)
 
 $(makeAcidic ''Database [
   'addDocument,
@@ -42,6 +45,13 @@ main = do
       putStrLn ("document query on: " ++ q)
       display documents
     ["delete"] -> deletePrompt
+    ["sync"] -> putStrLn "doSync" -- doSync
+    ["serve", p] -> do
+      let port = read p :: Int
+      putStrLn ("Starting on port " ++ show port ++ "...")
+      Exception.catch
+        (runServer port)
+        (\ Exception.UserInterrupt -> putStrLn "\nStopping...")
     [] -> do
       putStrLn "Last 10 documents:"
       documents <- query database (ViewDocuments 10)
@@ -49,8 +59,12 @@ main = do
     _  -> putStrLn usage
 
 usage = unlines [ "usage:"
-                , "  add title tag1,tag2,tag3 content and stuff"
-                , "  search <term>"
+                , "  client functions:"
+                , "    add title tag1,tag2,tag3 content and stuff"
+                , "    search <term>"
+                , "  remote functions:"
+                , "    serve <port>"
+                , "    sync"
                 , "----"
                 , "no argument gives you the last 10 documents added"]
 

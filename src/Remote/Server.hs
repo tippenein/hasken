@@ -1,17 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
-module DocumentStore.Server (runServer) where
+module Remote.Server (runServer) where
 
+import Control.Monad.IO.Class               (liftIO)
 import Control.Monad.Trans.Either
-import Control.Monad.IO.Class (liftIO)
 import Data.Text
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.RequestLogger
 import Servant
 
-import DocumentStore.API as API
-import DocumentStore.Types
-import DocumentStore.Database as Database
+import Remote.API                           as API
+import Remote.Database                      as Database
+import Remote.Types
 
 -- | helper type for handling the default servant response
 -- data Handler a = EitherT ServantErr IO a

@@ -2,18 +2,18 @@
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE TypeFamilies       #-}
 
-module DocumentStore.Database
+module Remote.Database
   (
     insertDocument
   , selectDocuments
   ) where
 
 import Control.Monad.Reader (ask)
-import Control.Monad.State (get, put)
+import Control.Monad.State  (get, put)
 import Data.Acid
 import Data.SafeCopy
 
-import DocumentStore.Types
+import Remote.Types
 
 data Database = Database [Document]
 $(deriveSafeCopy 0 'base ''Database)

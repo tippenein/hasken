@@ -23,15 +23,23 @@ executable hasken
   other-modules: Document
   build-depends:
       base
-    , mtl
     , acid-state
-    , wl-pprint
     , aeson
-    , safecopy
-    , split
     , directory
-    , text
+    , either
     , filepath
+    , mtl
+    , safecopy
+    , servant >= 0.4
+    , servant-client >= 0.4
+    , servant-server >= 0.4
+    , split
+    , text
+    , transformers
+    , warp
+    , wai
+    , wai-extra
+    , wl-pprint
   default-language:    Haskell2010
 
 test-suite hasken-test
