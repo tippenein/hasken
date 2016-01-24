@@ -1,0 +1,50 @@
+name:                document-store
+version:             0.0.1.0
+cabal-version:       >=1.10
+build-type:          Simple
+synopsis:            server component of local data store
+license:             BSD3
+license-file:        LICENSE
+homepage:            https://github.com/tippenein/hasken
+bug-reports:         https://github.com/tippenein/hasken/issues
+author:              brady.ouren
+maintainer:          brady.ouren@gmail.com
+copyright:           2015 brady.ouren <brady.ouren@gmail.com>
+extra-source-files:  README.md
+
+source-repository head
+  type:     git
+  location: git://github.com/tippenein/hasken.git
+
+executable document-store
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  build-depends:
+      base -any
+    , servant >= 0.4
+    , servant-client >= 0.4
+    , servant-server >= 0.4
+    , text
+    , aeson
+    , either
+    , acid-state
+    , transformers
+    , mtl
+    , safecopy
+    , warp
+    , wai
+    , wai-extra
+  default-language:    Haskell2010
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+
+test-suite document-store-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:
+      base
+    , hspec ==2.*
+    , HUnit -any
+    , QuickCheck -any
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
