@@ -6,17 +6,12 @@ module Main where
 import           Data.Acid
 import           Data.Maybe         (fromMaybe)
 import           Document
-import           System.Directory   (getHomeDirectory)
 import           System.Environment (getArgs, getEnv)
-import           System.FilePath    (joinPath)
 
+import           Config             (localStorageLocation)
 import qualified Control.Exception  as Exception
 import           Remote.Server      (runServer)
-
-storageLocation :: IO FilePath
-storageLocation = do
-  homePath <- getHomeDirectory
-  return (joinPath [homePath, ".hasken_store"])
+import           Sync               (doSync)
 
 deletePrompt :: IO ()
 deletePrompt = putStrLn "asdf"
@@ -44,7 +39,7 @@ search db q = do
 main :: IO ()
 main = do
   args <- getArgs
-  loc <- storageLocation
+  loc <- localStorageLocation
   database <- openLocalStateFrom loc (Database [])
   case args of
     ["help"] -> putStrLn usage

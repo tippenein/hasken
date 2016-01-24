@@ -20,7 +20,14 @@ executable hasken
   hs-source-dirs:      src
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  other-modules: Document
+  other-modules: 
+      Document
+    , Config
+    , Sync
+    , Remote.API
+    , Remote.Database
+    , Remote.Server
+    , Remote.Types
   build-depends:
       base
     , acid-state
@@ -40,6 +47,7 @@ executable hasken
     , wai
     , wai-extra
     , wl-pprint
+    , yaml
   default-language:    Haskell2010
 
 test-suite hasken-test

@@ -23,12 +23,12 @@ insertDoc doc = do
   Database documents <- get
   put (Database (doc:documents))
 
-selectDoc :: Int -> Query Database [Document]
-selectDoc limit = do
+selectDocs :: Int -> Query Database [Document]
+selectDocs limit = do
   Database documents <- ask
   return (take limit documents )
 
-$(makeAcidic ''Database ['insertDoc, 'selectDoc])
+$(makeAcidic ''Database ['insertDoc, 'selectDocs])
 
 insertDocument :: Document -> IO ()
 insertDocument doc = do
@@ -41,6 +41,6 @@ selectDocuments :: Int -> IO [Document]
 selectDocuments limit = do
   database <- openLocalState (Database [])
   putStrLn $ "The last " ++ show limit ++ "documents:\n" -- ++ (map show documents)
-  documents <- query database (SelectDoc limit)
+  documents <- query database (SelectDocs limit)
   closeAcidState database
   return documents
