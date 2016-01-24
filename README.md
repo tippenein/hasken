@@ -22,6 +22,8 @@ When a connection is present, it should push new data to a server for backup sto
 
 `stack install`
 
+##Usage
+
 search for something
 `hasken search query`
 
