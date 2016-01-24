@@ -4,7 +4,8 @@
 module Remote.API where
 
 import Data.Proxy
-import Remote.Types
+import Document     (Document)
+import Remote.Types (DocumentResponse)
 import Servant.API
 
 documentAPI :: Proxy DocumentAPI

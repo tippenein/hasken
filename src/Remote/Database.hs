@@ -13,7 +13,7 @@ import Control.Monad.State  (get, put)
 import Data.Acid
 import Data.SafeCopy
 
-import Remote.Types
+import Document             (Document)
 
 data Database = Database [Document]
 $(deriveSafeCopy 0 'base ''Database)

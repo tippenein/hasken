@@ -32,3 +32,6 @@ add something
 
 list the last 10 docs
 `hasken`
+
+launch the server side
+`hasken serve <port>`

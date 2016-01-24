@@ -13,12 +13,6 @@ import           System.FilePath    (joinPath)
 import qualified Control.Exception  as Exception
 import           Remote.Server      (runServer)
 
-$(makeAcidic ''Database [
-  'addDocument,
-  'viewDocuments,
-  'searchDocuments
-  ])
-
 storageLocation :: IO FilePath
 storageLocation = do
   homePath <- getHomeDirectory
@@ -29,6 +23,24 @@ deletePrompt = putStrLn "asdf"
 
 display = mapM_ displayDoc
 
+$(makeAcidic ''Database [
+  'addDocument,
+  'viewDocuments,
+  'searchDocuments
+  ])
+
+add db doc = do
+  putStrLn $ "added document: " ++ show doc
+  update db (AddDocument doc)
+
+list db limit = do
+  putStrLn $ "listing last " ++ show limit ++ "documents: "
+  query db (ViewDocuments limit)
+
+search db q = do
+  putStrLn $ "query on: " ++ q
+  query db (SearchDocuments q)
+
 main :: IO ()
 main = do
   args <- getArgs
@@ -38,14 +50,12 @@ main = do
     ["help"] -> putStrLn usage
     ["add", title, tags, content] -> do
       let newDoc = buildDocument $ [title, tags, content]
-      update database (AddDocument newDoc)
-      putStrLn "Your document has been added to the database."
+      add database newDoc
     ["search", q] -> do
-      documents <- query database (SearchDocuments q)
-      putStrLn ("document query on: " ++ q)
+      documents <- search database q
       display documents
     ["delete"] -> deletePrompt
-    ["sync"] -> putStrLn "doSync" -- doSync
+    ["sync"] -> putStrLn "doSync"
     ["serve", p] -> do
       let port = read p :: Int
       putStrLn ("Starting on port " ++ show port ++ "...")
@@ -53,10 +63,10 @@ main = do
         (runServer port)
         (\ Exception.UserInterrupt -> putStrLn "\nStopping...")
     [] -> do
-      putStrLn "Last 10 documents:"
-      documents <- query database (ViewDocuments 10)
+      documents <- list database 10
       display documents
     _  -> putStrLn usage
+  closeAcidState database
 
 usage = unlines [ "usage:"
                 , "  client functions:"

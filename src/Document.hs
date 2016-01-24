@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass     #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
@@ -11,6 +12,7 @@ import Control.Applicative     ((<$>), (<*>))
 import Control.Monad.Reader    (ask)
 import Control.Monad.State     (get, put)
 import Data.Acid
+import Data.Aeson
 import Data.List               (isInfixOf)
 import Data.List.Split         (splitOn)
 import Data.SafeCopy
@@ -19,12 +21,14 @@ import Data.Typeable
 import GHC.Generics
 import Text.PrettyPrint.Leijen (linebreak, putDoc, text, (<+>))
 
-data Database = Database [Document]
-
 data Document = Document { title   :: String
                          , content :: String
                          , tags    :: [String]
-                         } deriving (Eq, Ord, Typeable, Generic)
+                         } deriving (Eq, Ord, Typeable, ToJSON, FromJSON, Generic)
+
+data Database = Database [Document]
+
+(deriveSafeCopy 0 'base ''Database)
 
 displayDoc d = putDoc (
   text (title d) <+>
@@ -81,6 +85,4 @@ thirdAndOn args = tail (tail args)
 
 second :: [String] -> String
 second ds = head (tail ds)
-
-$(deriveSafeCopy 0 'base ''Database)
 
