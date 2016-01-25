@@ -2,11 +2,15 @@ module Sync
   (doSync)
   where
 
-import Config   (localStorageLocation)
-import Document (Database)
+import Config        (localStorageLocation)
+import Data.Acid
+import Document
+import Remote.Client as Client
+import Remote.Types  as Types
 
-doSync = undefined
-  -- localDB <- openLocalStateFrom localStorageLocation (Database [])
-  -- remoteDocs <- fetchRemoteDocuments
-  -- localDocs <- query localDB (Database [])
-  -- remoteDocs
+
+doSync = do
+  -- loc <- localStorageLocation
+  -- localDB <- openLocalStateFrom loc (Database [])
+  remoteDocs <- Client.listDocuments
+  putStrLn $ "to be synced: " ++ show (documents remoteDocs)

@@ -50,7 +50,7 @@ main = do
       documents <- search database q
       display documents
     ["delete"] -> deletePrompt
-    ["sync"] -> putStrLn "doSync"
+    ["sync"] -> doSync
     ["serve", p] -> do
       let port = read p :: Int
       putStrLn ("Starting on port " ++ show port ++ "...")
