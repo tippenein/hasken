@@ -13,11 +13,6 @@ import qualified Control.Exception  as Exception
 import           Remote.Server      (runServer)
 import           Sync               (doSync)
 
-deletePrompt :: IO ()
-deletePrompt = putStrLn "asdf"
-
-display = mapM_ displayDoc
-
 $(makeAcidic ''Database [
   'addDocument,
   'viewDocuments,
@@ -29,12 +24,17 @@ add db doc = do
   update db (AddDocument doc)
 
 list db limit = do
-  putStrLn $ "listing last " ++ show limit ++ "documents: "
+  putStrLn $ "listing last " ++ show limit ++ " documents: "
   query db (ViewDocuments limit)
 
 search db q = do
   putStrLn $ "query on: " ++ q
   query db (SearchDocuments q)
+
+deletePrompt :: IO ()
+deletePrompt = putStrLn "asdf"
+
+display = mapM_ displayDoc
 
 main :: IO ()
 main = do

@@ -19,7 +19,7 @@ import Data.SafeCopy
 import Data.Text               (Text)
 import Data.Typeable
 import GHC.Generics
-import Text.PrettyPrint.Leijen (linebreak, putDoc, text, (<+>))
+import Text.PrettyPrint.Leijen (linebreak, list, putDoc, text, (<+>))
 
 data Document = Document { title   :: String
                          , content :: String
@@ -28,14 +28,21 @@ data Document = Document { title   :: String
 
 data Database = Database [Document]
 
-(deriveSafeCopy 0 'base ''Database)
+deriveSafeCopy 0 'base ''Database
 
-displayDoc d = putDoc (
+displayDoc = putDoc . mainDoc
+displayDocWithTags d = putDoc (mainDoc d <+> tagDocs d)
+
+mainDoc d =
   text (title d) <+>
   text "->" <+>
   text (content d) <+>
   linebreak
-  )
+
+tagDocs d =
+  list (fmap text (tags d)) <+>
+  linebreak
+
 
 instance Show Document where
   show (Document title content tags) = title ++ " - " ++ content
