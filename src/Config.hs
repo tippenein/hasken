@@ -4,7 +4,6 @@
 module Config where
 
 import Data.Aeson       (FromJSON)
-import Data.Text        (Text)
 import Data.Yaml        as Yaml
 import GHC.Generics
 import System.Directory (getHomeDirectory)
@@ -20,7 +19,7 @@ data LocalConfig = LocalConfig {
 } deriving (Show, Generic, FromJSON)
 
 data ServerConfig = ServerConfig {
-    host :: Text
+    host :: String
   , port :: Int
 } deriving (Show, Generic, FromJSON)
 

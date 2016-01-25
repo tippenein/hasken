@@ -35,3 +35,20 @@ list the last 10 docs
 
 launch the server side
 `hasken serve <port>`
+
+## Sync
+To sync between the server and your local store
+`hasken sync`
+
+This will only push items which are not present on the server, and pull items
+the server has which your local store does not.
+
+The connection info for connecting to the remote server is in `~/.hasken.yml` and looks like this:
+
+```yaml
+remote:
+  host: somesite.com
+  port: 8082
+local:
+  sync: false
+```

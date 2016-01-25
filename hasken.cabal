@@ -25,6 +25,7 @@ executable hasken
     , Config
     , Sync
     , Remote.API
+    , Remote.Client
     , Remote.Database
     , Remote.Server
     , Remote.Types
