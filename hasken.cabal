@@ -47,6 +47,7 @@ executable hasken
     , warp
     , wai
     , wai-extra
+    , wai-cors
     , wl-pprint
     , yaml
   default-language:    Haskell2010

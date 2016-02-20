@@ -1,6 +1,7 @@
 .cabal-sandbox*
 tags
 .stack-work/
+node_modules/
 store/
 dist/*
 *.hi
