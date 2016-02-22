@@ -20,7 +20,7 @@ executable hasken
   hs-source-dirs:      src
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  other-modules: 
+  other-modules:
       Document
     , Config
     , Sync
@@ -38,12 +38,17 @@ executable hasken
     , filepath
     , mtl
     , safecopy
+    , resourcet
     , servant >= 0.4
     , servant-client >= 0.4
     , servant-server >= 0.4
     , split
     , text
+    , monad-logger
     , transformers
+    , persistent
+    , persistent-template
+    , persistent-sqlite
     , warp
     , wai
     , wai-extra

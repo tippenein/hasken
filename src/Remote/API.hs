@@ -4,8 +4,7 @@
 module Remote.API where
 
 import Data.Proxy
-import Document     (Document)
-import Remote.Types (DocumentResponse)
+import Remote.Database
 import Servant.API
 
 documentAPI :: Proxy DocumentAPI
@@ -17,16 +16,10 @@ type DocumentAPI =
 
 type ListDocuments =
      "documents"
-  :> Get '[JSON] DocumentResponse
+  :> Get '[JSON] [Document]
 
 type CreateDocument =
      "documents"
   :> ReqBody '[JSON] Document
   :> Post '[JSON] Document
 
-
--- separate definitions of each route will go here
--- for example:
---   type ListThings = "things"
---     :> QueryParam "someBool" Bool
---     :> Get '[JSON] Thing

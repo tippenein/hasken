@@ -1,0 +1,3 @@
+web:
+  domain: deltadrome.us
+  port: 8081

@@ -10,7 +10,7 @@ import           System.Environment (getArgs, getEnv)
 
 import           Config             (localStorageLocation)
 import qualified Control.Exception  as Exception
-import           Remote.Server      (runServer)
+import qualified Remote.Main        as Server
 import           Sync               (doSync)
 
 $(makeAcidic ''Database [
@@ -51,12 +51,7 @@ main = do
       display documents
     ["delete"] -> deletePrompt
     ["sync"] -> doSync
-    ["serve", p] -> do
-      let port = read p :: Int
-      putStrLn ("Starting on port " ++ show port ++ "...")
-      Exception.catch
-        (runServer port)
-        (\ Exception.UserInterrupt -> putStrLn "\nStopping...")
+    ["serve"] -> Server.main
     [] -> do
       documents <- list database 10
       display documents

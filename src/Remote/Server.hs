@@ -11,29 +11,24 @@ import Network.Wai.Middleware.RequestLogger (logStdout)
 import Servant
 
 import Remote.API                           as API
+import Remote.Config
 import Remote.Database                      as Database
 import Remote.Types
 
--- | helper type for handling the default servant response
-type Handler a = EitherT ServantErr IO a
 
 server :: Server DocumentAPI
 server =
        listDocuments
   :<|> createDocument
 
-listDocuments = do
-  documents <- liftIO $ Database.selectDocuments(100)
-  return $ DocumentResponse documents
+listDocuments = liftIO Database.selectDocuments
 
-createDocument doc = do
-  liftIO $ Database.insertDocument doc
-  return doc
+createDocument doc = liftIO $ Database.insertDocument doc
 
 middlewares = simpleCors . logStdout
 
 app :: Application
 app = middlewares (serve API.documentAPI server)
 
-runServer :: Port -> IO ()
-runServer port = run port app
+runServer :: Port ->  IO ()
+runServer port  = run port app

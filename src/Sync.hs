@@ -13,4 +13,4 @@ doSync = do
   -- loc <- localStorageLocation
   -- localDB <- openLocalStateFrom loc (Database [])
   remoteDocs <- Client.listDocuments
-  putStrLn $ "to be synced: " ++ show (documents remoteDocs)
+  putStrLn $ "to be synced: " ++ show remoteDocs

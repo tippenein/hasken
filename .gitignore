@@ -1,5 +1,7 @@
 .cabal-sandbox*
+hasken.yml
 tags
+*.db
 .stack-work/
 node_modules/
 store/

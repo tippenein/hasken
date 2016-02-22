@@ -1,46 +1,56 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE TemplateHaskell    #-}
-{-# LANGUAGE TypeFamilies       #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
 
 module Remote.Database
   (
     insertDocument
   , selectDocuments
+  , Document(..)
+  , runDB
+  , migrateAll
   ) where
 
-import Control.Monad.Reader (ask)
-import Control.Monad.State  (get, put)
-import Data.Acid
-import Data.SafeCopy
+import Control.Monad.IO.Class       (liftIO)
+import Control.Monad.Trans.Resource
+import Data.Int                     (Int64)
+import Data.Text                    (Text)
+import Database.Persist
+import Database.Persist.Sqlite
+import Database.Persist.TH
+import GHC.Generics                 (Generic)
+import Remote.Config
+import Servant.Server               (ServantErr)
 
-import Document             (Document)
+runDB = runSqlite "hasken.dev.db"
 
-data Database = Database [Document]
-$(deriveSafeCopy 0 'base ''Database)
+persistValue (Entity _ v) = v
 
-insertDoc :: Document -> Update Database ()
-insertDoc doc = do
-  Database documents <- get
-  put (Database (doc:documents))
+share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+Document json
+    title Text
+    content Text
+    tags [Text]
+    UniqueTitleAndContent title content
+    deriving Eq Show Generic
+|]
 
-selectDocs :: Int -> Query Database [Document]
-selectDocs limit = do
-  Database documents <- ask
-  return (take limit documents )
+selectDocuments :: IO [Document]
+selectDocuments = do
+  docs <- runDB $ selectList [] []
+  return $ map persistValue docs
 
-$(makeAcidic ''Database ['insertDoc, 'selectDocs])
 
-insertDocument :: Document -> IO ()
+insertDocument :: Document -> IO Document
 insertDocument doc = do
-  database <- openLocalState (Database [])
-  update database (InsertDoc doc)
-  closeAcidState database
-  putStrLn $ "saved document" ++ show doc
-
-selectDocuments :: Int -> IO [Document]
-selectDocuments limit = do
-  database <- openLocalState (Database [])
-  putStrLn $ "The last " ++ show limit ++ "documents:\n" -- ++ (map show documents)
-  documents <- query database (SelectDocs limit)
-  closeAcidState database
-  return documents
+  runDB $ insert_ doc
+  return doc
