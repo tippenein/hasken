@@ -10,14 +10,26 @@ import           System.Environment (getArgs, getEnv)
 
 import           Config             (localStorageLocation)
 import qualified Control.Exception  as Exception
+import qualified Remote.Client      as Client
 import qualified Remote.Main        as Server
-import           Sync               (doSync)
+import           Sync               (createDoc, fromDatabaseDoc)
 
 $(makeAcidic ''Database [
   'addDocument,
   'viewDocuments,
   'searchDocuments
   ])
+
+
+upsert docs database = undefined
+  -- fmap (\doc -> update database (AddDocument (fromDatabaseDoc doc))) docs
+
+doSync localDocs database = do
+  mapM_ createDoc localDocs
+  remoteDocs <- Client.listDocuments
+  -- upsert remoteDocs database
+  createCheckpoint database
+  putStrLn $ "synced: " ++ show remoteDocs
 
 add db doc = do
   putStrLn $ "added document: " ++ show doc
@@ -50,8 +62,12 @@ main = do
       documents <- search database q
       display documents
     ["delete"] -> deletePrompt
-    ["sync"] -> doSync
-    ["serve"] -> Server.main
+    ["sync"] -> do
+      documents <- list database 1000
+      doSync documents database
+    ["serve"] -> do
+      closeAcidState database
+      Server.main
     [] -> do
       documents <- list database 10
       display documents
