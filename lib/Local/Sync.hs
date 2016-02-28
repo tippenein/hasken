@@ -1,7 +1,7 @@
-module Sync where
+module Local.Sync where
 
 import           Data.Text       (pack, unpack)
-import           Document        (Document (..))
+import           Local.Document  (Document (..))
 import qualified Remote.Client   as Client
 import qualified Remote.Database as DB
 

@@ -6,7 +6,7 @@
 {-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE TypeFamilies       #-}
 
-module Document where
+module Local.Document where
 
 import Control.Applicative     ((<$>), (<*>))
 import Control.Monad.Reader    (ask)

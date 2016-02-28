@@ -3,16 +3,16 @@
 
 module Main where
 
+import qualified Control.Exception  as Exception
 import           Data.Acid
 import           Data.Maybe         (fromMaybe)
-import           Document
 import           System.Environment (getArgs, getEnv)
 
-import           Config             (localStorageLocation)
-import qualified Control.Exception  as Exception
+import           Local.Config       (localStorageLocation)
+import           Local.Document
+import           Local.Sync         (createDoc, fromDatabaseDoc)
 import qualified Remote.Client      as Client
 import qualified Remote.Main        as Server
-import           Sync               (createDoc, fromDatabaseDoc)
 
 $(makeAcidic ''Database [
   'addDocument,

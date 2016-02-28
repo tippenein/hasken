@@ -13,7 +13,6 @@ import Servant
 import Remote.API                           as API
 import Remote.Config
 import Remote.Database                      as Database
-import Remote.Types
 
 
 server :: Server DocumentAPI

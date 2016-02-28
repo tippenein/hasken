@@ -1,4 +1,4 @@
-module Config where
+module Local.Config where
 
 import System.Directory (getHomeDirectory)
 import System.FilePath  (joinPath)
