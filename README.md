@@ -1,6 +1,8 @@
 Hasken
 ----
 
+[![Build Status](https://travis-ci.org/tippenein/hasken.svg?branch=master)](https://travis-ci.org/tippenein/hasken)
+
 Hasken you shall receive
 
 Easily searchable local document store with option to push to server for backup
