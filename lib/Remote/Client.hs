@@ -7,7 +7,7 @@ import Servant                    hiding (host)
 import Servant.Client             hiding (host)
 import System.IO.Unsafe           (unsafePerformIO)
 
-import Local.Config
+import Config
 import Remote.API
 
 type Action a = EitherT ServantError IO a
