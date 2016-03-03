@@ -28,10 +28,10 @@ data HaskenConfig = HaskenConfig
   } deriving (Show, Generic, FromJSON)
 
 data RemoteConfig = RemoteConfig
-  { remoteDomain :: String
-  , remotePort   :: Int
+  { domain :: String
+  , port   :: Int
   } deriving (Show, Generic, FromJSON)
 
 data LocalConfig = LocalConfig
-  { showTags :: Boolean
+  { showTags :: Bool
   } deriving (Show, Generic, FromJSON)

@@ -8,7 +8,7 @@ import           Data.Acid
 import           Data.Maybe         (fromMaybe)
 import           System.Environment (getArgs, getEnv)
 
-import           Config             (localStorageLocation, readConfig)
+import           Config
 import qualified Control.Exception  as Exception
 import           Local.Document
 import           Local.Sync         (createDoc, fromDatabaseDoc)
@@ -45,13 +45,17 @@ list db limit = do
 deletePrompt :: IO ()
 deletePrompt = putStrLn "asdf"
 
-display = mapM_ displayDoc
+display :: [Document] -> IO ()
+display docs = do
+  showTagsP <- showTags <$> localConfig
+  case showTagsP of
+    True -> mapM_ displayDocWithTags docs
+    False -> mapM_ displayDoc docs
 
 main :: IO ()
 main = do
   args <- getArgs
   loc <- localStorageLocation
-  showTagsP <- showTags <$> localConfig
   database <- openLocalStateFrom loc (Database [])
   case args of
     ["help"] -> putStrLn usage
@@ -70,9 +74,7 @@ main = do
       Server.main
     [] -> do
       documents <- list database 10
-      case showTagsP of
-        True -> mapM_ displayDocWithTags documents
-        False -> display documents
+      display documents
     _  -> putStrLn usage
   closeAcidState database
 

@@ -21,8 +21,8 @@ run action = do
 
 makeBaseUrl :: IO BaseUrl
 makeBaseUrl = do
-  h <- remoteDomain <$> remote <$> readConfig "./hasken.yml"
-  p <- remotePort <$> remote <$> readConfig "./hasken.yml"
+  h <- domain <$> remote <$> readConfig "./hasken.yml"
+  p <- port <$> remote <$> readConfig "./hasken.yml"
   return $ BaseUrl Http h p
 
 listDocuments' :<|> createDocument' =

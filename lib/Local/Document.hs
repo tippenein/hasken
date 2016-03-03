@@ -19,7 +19,9 @@ import Data.SafeCopy
 import Data.Text               (Text)
 import Data.Typeable
 import GHC.Generics
-import Text.PrettyPrint.Leijen (linebreak, list, putDoc, text, (<+>))
+import System.IO               (stdout)
+import Text.PrettyPrint.Leijen (displayIO, displayS, linebreak, list, putDoc,
+                                renderPretty, sep, text, (<+>))
 
 data Document = Document { title   :: String
                          , content :: String
@@ -31,8 +33,9 @@ data Database = Database [Document]
 deriveSafeCopy 0 'base ''Database
 
 displayDoc = putDoc . mainDoc
-displayDocWithTags d = putDoc (mainDoc d <+> tagDocs d)
+displayDocWithTags d = renderWidth 1000 (mainDoc d <+> tagDocs d)
 
+renderWidth w x = displayIO stdout (renderPretty 0.4 w x)
 mainDoc d =
   text (title d) <+>
   text "->" <+>
@@ -40,7 +43,8 @@ mainDoc d =
   linebreak
 
 tagDocs d =
-  list (fmap text (tags d)) <+>
+  text "  ~~| " <+>
+  sep (fmap text (tags d)) <+>
   linebreak
 
 
