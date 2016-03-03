@@ -73,11 +73,15 @@ test-suite hasken-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:
-    HaskenSpec
+      Spec.RemoteSpec
+    , Spec.LocalSpec
   build-depends:
       base
     , hasken -any
     , hspec ==2.*
+    , hspec-wai
+    , hspec-wai-json
+    , directory
     , HUnit -any
     , QuickCheck -any
   default-language:    Haskell2010

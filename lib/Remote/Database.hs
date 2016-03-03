@@ -31,7 +31,8 @@ import GHC.Generics                 (Generic)
 import Remote.Config
 import Servant.Server               (ServantErr)
 
-runDB = runSqlite "hasken.dev.db"
+runOnDb name = runSqlite name
+runDB = runOnDb "hasken.dev.db"
 
 persistValue (Entity _ v) = v
 

@@ -39,10 +39,6 @@ list db limit = do
   putStrLn $ "listing last " ++ show limit ++ " documents: "
   query db (ViewDocuments limit)
 
-search db q = do
-  putStrLn $ "query on: " ++ q
-  query db (SearchDocuments q)
-
 deletePrompt :: IO ()
 deletePrompt = putStrLn "asdf"
 
@@ -58,8 +54,8 @@ main = do
     ["add", title, tags, content] -> do
       let newDoc = buildDocument $ [title, tags, content]
       add database newDoc
-    ["search", q] -> do
-      documents <- search database q
+    ("search" : qs) -> do
+      documents <- query database (SearchDocuments qs)
       display documents
     ["delete"] -> deletePrompt
     ["sync"] -> do

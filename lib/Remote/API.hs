@@ -4,6 +4,7 @@
 module Remote.API where
 
 import Data.Proxy
+import Data.Text       (Text)
 import Remote.Database
 import Servant.API
 

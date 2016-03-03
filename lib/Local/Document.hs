@@ -69,16 +69,22 @@ viewDocuments limit = do
   Database documents <- ask
   return (take limit documents)
 
-searchDocuments :: String -> Query Database [Document]
-searchDocuments query = do
+searchDocuments :: [String] -> Query Database [Document]
+searchDocuments queries = do
   Database documents <- ask
-  return (filter filterDoc documents)
-  where
-    filterDoc document =
-      (query `isInfixOf` title document) ||
-      (query `isInfixOf` content document) ||
-      any (isInfixOf query) (tags document)
+  return $ searchDoc queries documents
 
+searchDoc :: [String] -> [Document] -> [Document]
+searchDoc queries =
+  filter filterDoc
+    where
+      filterDoc document =
+        overQueries (title document) queries ||
+        overQueries (content document) queries ||
+        any (\a -> overQueries a queries) (tags document)
+
+overQueries :: String -> [String] -> Bool
+overQueries content searches = any (\search -> search `isInfixOf` content) searches
 
 buildDocument :: [String] -> Document
 buildDocument args = Document {title = _title, tags = _tags, content = _content}
