@@ -8,7 +8,8 @@ import           Data.Acid
 import           Data.Maybe         (fromMaybe)
 import           System.Environment (getArgs, getEnv)
 
-import           Local.Config       (localStorageLocation)
+import           Config             (localStorageLocation, readConfig)
+import qualified Control.Exception  as Exception
 import           Local.Document
 import           Local.Sync         (createDoc, fromDatabaseDoc)
 import qualified Remote.Client      as Client
@@ -20,6 +21,8 @@ $(makeAcidic ''Database [
   'searchDocuments
   ])
 
+localConfig :: IO LocalConfig
+localConfig = local <$> readConfig "./hasken.yml"
 
 upsert docs database = undefined
   -- fmap (\doc -> update database (AddDocument (fromDatabaseDoc doc))) docs
@@ -48,6 +51,7 @@ main :: IO ()
 main = do
   args <- getArgs
   loc <- localStorageLocation
+  showTagsP <- showTags <$> localConfig
   database <- openLocalStateFrom loc (Database [])
   case args of
     ["help"] -> putStrLn usage
@@ -66,7 +70,9 @@ main = do
       Server.main
     [] -> do
       documents <- list database 10
-      display documents
+      case showTagsP of
+        True -> mapM_ displayDocWithTags documents
+        False -> display documents
     _  -> putStrLn usage
   closeAcidState database
 

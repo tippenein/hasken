@@ -35,7 +35,7 @@ add something
 list the last 10 docs
 `hasken`
 
-launch the server side
+launch the server
 `hasken serve <port>`
 
 ## Sync
@@ -52,5 +52,5 @@ remote:
   host: somesite.com
   port: 8082
 local:
-  sync: false
+  show_tags: false
 ```
