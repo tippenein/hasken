@@ -24,6 +24,8 @@ When a connection is present, it should push new data to a server for backup sto
 
 `stack install`
 
+`cp hasken.yml.sample ~/.hasken.yml`
+
 ##Usage
 
 search for something
@@ -52,5 +54,5 @@ remote:
   host: somesite.com
   port: 8082
 local:
-  show_tags: false
+  showTags: false
 ```
