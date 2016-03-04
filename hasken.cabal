@@ -22,8 +22,8 @@ library
   exposed-modules:
       Local
     , Remote
+    , Config
     , Local.Document
-    , Local.Config
     , Local.Sync
     , Remote.API
     , Remote.Client

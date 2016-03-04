@@ -8,7 +8,8 @@ import           Data.Acid
 import           Data.Maybe         (fromMaybe)
 import           System.Environment (getArgs, getEnv)
 
-import           Local.Config       (localStorageLocation)
+import           Config
+import qualified Control.Exception  as Exception
 import           Local.Document
 import           Local.Sync         (createDoc, fromDatabaseDoc)
 import qualified Remote.Client      as Client
@@ -20,6 +21,8 @@ $(makeAcidic ''Database [
   'searchDocuments
   ])
 
+localConfig :: IO LocalConfig
+localConfig = local <$> readConfig "./hasken.yml"
 
 upsert docs database = undefined
   -- fmap (\doc -> update database (AddDocument (fromDatabaseDoc doc))) docs
@@ -42,7 +45,12 @@ list db limit = do
 deletePrompt :: IO ()
 deletePrompt = putStrLn "asdf"
 
-display = mapM_ displayDoc
+display :: [Document] -> IO ()
+display docs = do
+  showTagsP <- showTags <$> localConfig
+  case showTagsP of
+    True -> mapM_ displayDocWithTags docs
+    False -> mapM_ displayDoc docs
 
 main :: IO ()
 main = do
