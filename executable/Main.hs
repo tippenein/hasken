@@ -8,7 +8,7 @@ import           Data.Acid
 import           Data.Maybe         (fromMaybe)
 import           System.Environment (getArgs, getEnv)
 
-import           Config
+import           Config             as Config
 import qualified Control.Exception  as Exception
 import           Local.Document
 import           Local.Sync         (createDoc, fromDatabaseDoc)
@@ -21,8 +21,6 @@ $(makeAcidic ''Database [
   'searchDocuments
   ])
 
-localConfig :: IO LocalConfig
-localConfig = local <$> readConfig "./hasken.yml"
 
 upsert docs database = undefined
   -- fmap (\doc -> update database (AddDocument (fromDatabaseDoc doc))) docs
@@ -47,10 +45,10 @@ deletePrompt = putStrLn "asdf"
 
 display :: [Document] -> IO ()
 display docs = do
-  showTagsP <- showTags <$> localConfig
-  case showTagsP of
-    True -> mapM_ displayDocWithTags docs
-    False -> mapM_ displayDoc docs
+  showTagsP <- showTags <$> Config.localConfig
+  if showTagsP
+     then mapM_ displayDocWithTags docs
+     else mapM_ displayDoc docs
 
 main :: IO ()
 main = do

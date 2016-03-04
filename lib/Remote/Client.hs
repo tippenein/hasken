@@ -7,7 +7,7 @@ import Servant                    hiding (host)
 import Servant.Client             hiding (host)
 import System.IO.Unsafe           (unsafePerformIO)
 
-import Config
+import Config                     as Config
 import Remote.API
 
 type Action a = EitherT ServantError IO a
@@ -21,8 +21,8 @@ run action = do
 
 makeBaseUrl :: IO BaseUrl
 makeBaseUrl = do
-  h <- domain <$> remote <$> readConfig "./hasken.yml"
-  p <- port <$> remote <$> readConfig "./hasken.yml"
+  h <- domain <$> Config.remoteConfig
+  p <- port <$> Config.remoteConfig
   return $ BaseUrl Http h p
 
 listDocuments' :<|> createDocument' =
