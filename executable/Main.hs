@@ -28,9 +28,9 @@ upsert docs database = undefined
 doSync localDocs database = do
   mapM_ createDoc localDocs
   remoteDocs <- Client.listDocuments
-  -- upsert remoteDocs database
+  -- update database (Database (map fromDatabaseDoc remoteDocs))
   createCheckpoint database
-  putStrLn $ "synced: " ++ show remoteDocs
+  putStrLn "synced"
 
 add db doc = do
   putStrLn $ "added document: " ++ show doc
@@ -49,6 +49,10 @@ display docs = do
   if showTagsP
      then mapM_ displayDocWithTags docs
      else mapM_ displayDoc docs
+
+-- withAcidState = do
+--   loc <- localStorageLocation
+--   Exception.bracket (openLocalStateFrom loc (Database [])) (closeAcidState)
 
 main :: IO ()
 main = do

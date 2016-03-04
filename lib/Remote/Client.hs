@@ -25,8 +25,9 @@ makeBaseUrl = do
   p <- port <$> Config.remoteConfig
   return $ BaseUrl Http h p
 
-listDocuments' :<|> createDocument' =
+listDocuments' :<|> createDocument' :<|> listTags' =
   client documentAPI (unsafePerformIO makeBaseUrl)
 
 listDocuments = run listDocuments'
 createDocument doc = run $ createDocument' doc
+listTags = run listTags'

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Remote.Server (runServer) where
+module Remote.Server (app, runServer) where
 
 import Control.Monad.IO.Class               (liftIO)
 import Control.Monad.Trans.Either
@@ -19,10 +19,11 @@ server :: Server DocumentAPI
 server =
        listDocuments
   :<|> createDocument
+  :<|> listTags
 
 listDocuments = liftIO Database.selectDocuments
-
 createDocument doc = liftIO $ Database.insertDocument doc
+listTags = liftIO Database.selectTags
 
 middlewares = simpleCors . logStdout
 

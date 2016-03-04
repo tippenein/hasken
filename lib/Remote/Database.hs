@@ -15,6 +15,7 @@ module Remote.Database
   (
     insertDocument
   , selectDocuments
+  , selectTags
   , Document(..)
   , runDB
   , migrateAll
@@ -55,3 +56,10 @@ insertDocument :: Document -> IO Document
 insertDocument doc = do
   runDB $ insert_ doc
   return doc
+
+selectTags :: IO [Text]
+selectTags = do
+  docs <- runDB $ selectList [] []
+  tags <- return $ map (documentTags . persistValue) docs
+  return $ concatMap id tags
+

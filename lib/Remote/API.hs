@@ -14,6 +14,7 @@ documentAPI = Proxy
 type DocumentAPI =
        ListDocuments
   :<|> CreateDocument
+  :<|> ListTags
 
 type ListDocuments =
      "documents"
@@ -24,3 +25,6 @@ type CreateDocument =
   :> ReqBody '[JSON] Document
   :> Post '[JSON] Document
 
+type ListTags =
+     "tags"
+  :> Get '[JSON] [Text]
