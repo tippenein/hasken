@@ -7,10 +7,12 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = do
-  describe "searchDocuments" $ do
+  describe "#add" $ do
     it "builds content correctly" $ do
       let doc = buildDocument ["title", "tags", "content", "separated", "by", "spaces"]
       content doc `shouldBe` "content separated by spaces"
+
+  describe "#search" $ do
 
     it "searches on title" $ do
       let doc1 = Document "title1" "content1" ["tag1", "tag2"]
@@ -29,3 +31,7 @@ spec = do
       let doc2 = Document "b" "not the same" []
       let result = searchDoc ["distinct"] [doc1, doc2]
       result `shouldContain` [doc1]
+
+  describe "arg parsing" $ do
+    it "prints version" $ do
+      pending

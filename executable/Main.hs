@@ -3,17 +3,21 @@
 
 module Main where
 
-import qualified Control.Exception  as Exception
+import qualified Control.Exception   as Exception
 import           Data.Acid
-import           Data.Maybe         (fromMaybe)
-import           System.Environment (getArgs, getEnv)
+import           Data.Maybe          (fromMaybe)
+import qualified Data.Text           as T
+import qualified Data.Text.IO        as T
+import qualified Data.Version        as Version
+import           Options.Applicative
+import qualified Paths_hasken        as Meta
+import           System.Environment  (getArgs, getEnv)
 
-import           Config             as Config
-import qualified Control.Exception  as Exception
+import           Config
 import           Local.Document
-import           Local.Sync         (createDoc, fromDatabaseDoc)
-import qualified Remote.Client      as Client
-import qualified Remote.Main        as Server
+import           Local.Sync          (createDoc, fromDatabaseDoc)
+import qualified Remote.Client       as Client
+import qualified Remote.Main         as Server
 
 $(makeAcidic ''Database [
   'addDocument,
@@ -45,44 +49,98 @@ deletePrompt = putStrLn "asdf"
 
 display :: [Document] -> IO ()
 display docs = do
-  showTagsP <- showTags <$> Config.localConfig
-  if showTagsP
+  showTagsSetting <- showTags <$> localConfig
+  if showTagsSetting
      then mapM_ displayDocWithTags docs
      else mapM_ displayDoc docs
 
-main :: IO ()
-main = do
-  args <- getArgs
+showTagsParser :: Parser Bool
+showTagsParser =
+  switch (
+    long "show-tags"
+    <> help "show tags when displaying documents" )
+
+optParser :: Parser Options
+optParser =
+  Options
+  <$> switch (long "version" <> help "Show version and exit")
+  <*> showTagsParser
+  <*> commandParser
+
+parseAdd :: Parser Command
+parseAdd =
+  Add <$> some (argument str (metavar "Title Tag1,Tag2 Content and stuff"))
+
+parseSearch :: Parser Command
+parseSearch =
+  Search <$> some (argument str (metavar "QUERIES.."))
+
+parseList :: Parser Command
+parseList = List <$> optional (argument str (metavar "LIMIT"))
+
+withInfo :: Parser a -> String -> ParserInfo a
+withInfo opts desc = info (helper <*> opts) $ progDesc desc
+
+commandParser :: Parser Command
+commandParser =
+  subparser $
+       command "add" (parseAdd `withInfo` "Add a document to the local storage")
+    <> command "search" (parseSearch `withInfo` "search the local docs")
+    <> command "list" (parseList `withInfo` "list local docs (defaults to limit 10)")
+    <> command "sync" (pure Sync `withInfo` "sync with the remote")
+    <> command "serve" (pure Serve `withInfo` "serve an instance of the remote component")
+
+data Options
+  = Options
+  { optShowVersion :: Bool
+  , optShowTags    :: Bool
+  , optCommand     :: Command }
+
+data Command
+  = Add [String]
+  | Search [String]
+  | List (Maybe String)
+  | Sync
+  | Serve
+
+showVersion =
+  putStrLn $ "Version " <> Version.showVersion Meta.version
+
+run :: Options -> IO ()
+run opts =
+  if optShowVersion opts
+  then showVersion
+  else run' opts
+
+run' :: Options -> IO ()
+run' opts = do
   loc <- localStorageLocation
   database <- openLocalStateFrom loc (Database [])
-  case args of
-    ["help"] -> putStrLn usage
-    ["add", title, tags, content] -> do
-      let newDoc = buildDocument $ [title, tags, content]
+  case optCommand opts of
+    Add passedArgs -> do
+      let newDoc = buildDocument passedArgs
       add database newDoc
-    ("search" : qs) -> do
+    Search qs -> do
       documents <- query database (SearchDocuments qs)
       display documents
-    ["delete"] -> deletePrompt
-    ["sync"] -> do
+    Sync -> do
       documents <- list database 1000
       doSync documents database
-    ["serve"] -> do
+    Serve -> do
       closeAcidState database
       Server.main
-    [] -> do
+    List i -> do
       documents <- list database 10
       display documents
-    _  -> putStrLn usage
+
   closeAcidState database
 
-usage = unlines [ "usage:"
-                , "  client functions:"
-                , "    add title tag1,tag2,tag3 content and stuff"
-                , "    search <term>"
-                , "  remote functions:"
-                , "    serve <port>"
-                , "    sync"
-                , "----"
-                , "no argument gives you the last 10 documents added"]
-
+main :: IO ()
+main = execParser opts >>= run
+  where
+    opts =
+      info (helper <*> optParser)
+      ( fullDesc
+      <> progDesc "tagged local storage with a sync option"
+      <> header "create and tag documents for searchable recall"
+      )
