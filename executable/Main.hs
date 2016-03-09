@@ -36,13 +36,7 @@ doSync localDocs database = do
   createCheckpoint database
   putStrLn $ "synced: " ++ show remoteDocs
 
-add db doc = do
-  putStrLn $ "added document: " ++ show doc
-  update db (AddDocument doc)
 
-list db limit = do
-  putStrLn $ "listing last " ++ show limit ++ " documents: "
-  query db (ViewDocuments limit)
 
 deletePrompt :: IO ()
 deletePrompt = putStrLn "asdf"
@@ -63,7 +57,7 @@ showTagsParser =
 optParser :: Parser Options
 optParser =
   Options
-  <$> switch (long "version" <> help "Show version and exit")
+  <$> switch (short 'v' <> long "version" <> help "Show version and exit")
   <*> showTagsParser
   <*> commandParser
 
@@ -112,28 +106,30 @@ run opts =
   then showVersion
   else run' opts
 
+withLocalDatabase = Exception.bracket openDb closeAcidState
+  where
+    openDb = do
+      loc <- localStorageLocation
+      openLocalStateFrom loc (Database [])
+
 run' :: Options -> IO ()
-run' opts = do
-  loc <- localStorageLocation
-  database <- openLocalStateFrom loc (Database [])
+run' opts = withLocalDatabase $ \database ->
   case optCommand opts of
     Add passedArgs -> do
       let newDoc = buildDocument passedArgs
-      add database newDoc
-    Search qs -> do
-      documents <- query database (SearchDocuments qs)
-      display documents
+      update database (AddDocument newDoc)
+    Search qs ->
+      query database (SearchDocuments qs) >>= display
     Sync -> do
-      documents <- list database 1000
+      documents <- query database (ViewDocuments 1000)
       doSync documents database
     Serve -> do
       closeAcidState database
       Server.main
-    List i -> do
-      documents <- list database 10
-      display documents
-
-  closeAcidState database
+    List i ->
+      case i of
+        Nothing -> query database (ViewDocuments 10) >>= display
+        Just n -> query database (ViewDocuments (read n :: Int)) >>= display
 
 main :: IO ()
 main = execParser opts >>= run
