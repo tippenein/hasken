@@ -36,11 +36,6 @@ doSync localDocs database = do
   createCheckpoint database
   putStrLn $ "synced: " ++ show remoteDocs
 
-
-
-deletePrompt :: IO ()
-deletePrompt = putStrLn "asdf"
-
 display :: [Document] -> IO ()
 display docs = do
   showTagsSetting <- showTags <$> localConfig
@@ -51,13 +46,12 @@ display docs = do
 showTagsParser :: Parser Bool
 showTagsParser =
   switch (
-    long "show-tags"
-    <> help "show tags when displaying documents" )
+    long "show-tags" <> help "show tags when displaying documents" )
 
 optParser :: Parser Options
 optParser =
   Options
-  <$> switch (short 'v' <> long "version" <> help "Show version and exit")
+  <$> switch (long "version" <> help "Show version and exit")
   <*> showTagsParser
   <*> commandParser
 
@@ -75,20 +69,20 @@ parseList = List <$> optional (argument str (metavar "LIMIT"))
 withInfo :: Parser a -> String -> ParserInfo a
 withInfo opts desc = info (helper <*> opts) $ progDesc desc
 
-commandParser :: Parser Command
-commandParser =
-  subparser $
-       command "add" (parseAdd `withInfo` "Add a document to the local storage")
-    <> command "search" (parseSearch `withInfo` "search the local docs")
-    <> command "list" (parseList `withInfo` "list local docs (defaults to limit 10)")
-    <> command "sync" (pure Sync `withInfo` "sync with the remote")
-    <> command "serve" (pure Serve `withInfo` "serve an instance of the remote component")
+commandParser :: Parser (Maybe Command)
+commandParser = optional $ subparser $
+     command "add" (parseAdd `withInfo` "Add a document to the local storage")
+  <> command "search" (parseSearch `withInfo` "search the local docs")
+  <> command "list" (parseList `withInfo` "list local docs (defaults to limit 10)")
+  <> command "sync" (pure Sync `withInfo` "sync with the remote")
+  <> command "serve" (pure Serve `withInfo` "serve an instance of the remote component")
 
 data Options
   = Options
   { optShowVersion :: Bool
   , optShowTags    :: Bool
-  , optCommand     :: Command }
+  , optCommand     :: Maybe Command }
+  deriving (Show)
 
 data Command
   = Add [String]
@@ -96,15 +90,15 @@ data Command
   | List (Maybe String)
   | Sync
   | Serve
-
-showVersion =
-  putStrLn $ "Version " <> Version.showVersion Meta.version
+  deriving (Show)
 
 run :: Options -> IO ()
 run opts =
   if optShowVersion opts
   then showVersion
   else run' opts
+
+showVersion = putStrLn $ "Version " <> Version.showVersion Meta.version
 
 withLocalDatabase = Exception.bracket openDb closeAcidState
   where
@@ -113,8 +107,14 @@ withLocalDatabase = Exception.bracket openDb closeAcidState
       openLocalStateFrom loc (Database [])
 
 run' :: Options -> IO ()
-run' opts = withLocalDatabase $ \database ->
+run' opts =
   case optCommand opts of
+    Nothing -> error "should not reach this"
+    Just cmd -> processCmd cmd
+
+processCmd :: Command -> IO ()
+processCmd cmd = withLocalDatabase $ \database ->
+  case cmd of
     Add passedArgs -> do
       let newDoc = buildDocument passedArgs
       update database (AddDocument newDoc)
