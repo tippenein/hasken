@@ -28,17 +28,25 @@ When a connection is present, it should push new data to a server for backup sto
 
 ##Usage
 
-search for something
-`hasken search query`
+```
+$ hasken -h
+create and tag documents for searchable recall
 
-add something
-`hasken add title tag1,tag2,tag3 content blah blah blah`
+Usage: hasken [--version] [--show-tags] [COMMAND]
+  tagged local storage with a sync option
 
-list the last 10 docs
-`hasken`
+Available options:
+  -h,--help                Show this help text
+  --version                Show version and exit
+  --show-tags              show tags when displaying documents
 
-launch the server
-`hasken serve <port>`
+Available commands:
+  add                      Add a document to the local storage
+  search                   search the local docs
+  list                     list local docs (defaults to limit 10)
+  sync                     sync with the remote
+  serve                    serve an instance of the remote component
+```
 
 ## Sync
 To sync between the server and your local store
