@@ -123,9 +123,7 @@ processCmd cmd = withLocalDatabase $ \database ->
     Sync -> do
       documents <- query database (ViewDocuments 1000)
       doSync documents database
-    Serve -> do
-      closeAcidState database
-      Server.main
+    Serve -> Server.main
     List i ->
       case i of
         Nothing -> query database (ViewDocuments 10) >>= display

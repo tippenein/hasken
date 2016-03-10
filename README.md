@@ -15,11 +15,6 @@ use it for:
 
 all tagged and searchable from the commandline
 
-##Goal
-
-This document store should function without an internet connection.
-When a connection is present, it should push new data to a server for backup storage.
-
 ##Setup
 
 `stack install`
@@ -48,19 +43,22 @@ Available commands:
   serve                    serve an instance of the remote component
 ```
 
-## Sync
-To sync between the server and your local store
-`hasken sync`
-
-This will only push items which are not present on the server, and pull items
-the server has which your local store does not.
-
-The connection info for connecting to the remote server is in `~/.hasken.yml` and looks like this:
+## Config
 
 ```yaml
+# file: ~/.hasken.yml
 remote:
   host: somesite.com
   port: 8082
 local:
   showTags: false
 ```
+
+###remote:
+The `sync` option will only push items which are not present on the server, and pull items
+the server has exclusively.
+
+###local:
+The `showTags` yaml attribute can be overridden by the `--show-tags` flag in any command that displays documents
+
+
