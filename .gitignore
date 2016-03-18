@@ -13,3 +13,9 @@ __pycache__
 *~
 *.kvs
 store/
+/frontend/bower_components/
+/frontend/node_modules/
+/frontend/.pulp-cache/
+/frontend/output/
+/frontend/.psci*
+/frontend/src/.webpack.js
