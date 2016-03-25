@@ -79,19 +79,24 @@ viewDocuments limit = do
   Database documents <- ask
   return (take limit documents)
 
-searchDocuments :: [String] -> Query Database [Document]
-searchDocuments queries = do
+searchDocuments :: [String] -> String -> Query Database [Document]
+searchDocuments queries op = do
   Database documents <- ask
-  return $ searchDoc queries documents
+  return $ searchDoc queries op documents
 
-searchDoc :: [String] -> [Document] -> [Document]
-searchDoc queries =
-  filter filterDoc
-    where
-      filterDoc document =
-        overQueries (title document) queries ||
-        overQueries (content document) queries ||
-        any (\a -> overQueries a queries) (tags document)
+searchDoc :: [String] -> String -> [Document] -> [Document]
+searchDoc queries op =
+  filter (filterDoc queries op)
+
+filterDoc queries op document =
+  case op of
+    "And" -> a && b && (all c (tags document))
+    "Or" -> a || b || (any c (tags document))
+
+  where
+    a = overQueries (title document) queries
+    b = overQueries (content document) queries
+    c = (\a -> overQueries a queries)
 
 overQueries :: String -> [String] -> Bool
 overQueries content searches = any (\search -> search `isInfixOf` content) searches

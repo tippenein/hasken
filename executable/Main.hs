@@ -45,7 +45,13 @@ optParser =
   Options
   <$> switch (long "version" <> help "Show version and exit")
   <*> showTagsParser
+  <*> searchOperatorParser
   <*> commandParser
+
+
+searchOperatorParser :: Parser SearchOperator
+searchOperatorParser =
+  flag Or And ( long "and" <> help "Enable more precise AND searching" )
 
 parseAdd :: Parser Command
 parseAdd =
@@ -69,12 +75,16 @@ commandParser = optional $ subparser $
   <> command "sync" (pure Sync `withInfo` "sync with the remote")
   <> command "serve" (pure Serve `withInfo` "serve an instance of the remote component")
 
+data SearchOperator = Or | And
+  deriving (Show, Eq)
+
 data Options
   = Options
-  { optShowVersion :: Bool
-  , optShowTags    :: Bool
-  , optCommand     :: Maybe Command }
-  deriving (Show)
+  { optShowVersion    :: Bool
+  , optShowTags       :: Bool
+  , optSearchOperator :: SearchOperator
+  , optCommand        :: Maybe Command
+  } deriving (Show)
 
 data Command
   = Add [String]
@@ -102,28 +112,22 @@ showHelpText :: ParserPrefs -> ParserInfo a -> IO ()
 showHelpText pprefs pinfo = handleParseResult . Failure $
   parserFailure pprefs pinfo ShowHelpText mempty
 
-defaultPrefs = ParserPrefs
-      { prefMultiSuffix = ""
-      , prefDisambiguate = False
-      , prefShowHelpOnError = False
-      , prefBacktrack = True
-      , prefColumns = 80 }
-
 run' :: Options -> IO ()
 run' opts =
   case optCommand opts of
     Nothing -> showHelpText defaultPrefs parserOpts
-    Just cmd -> processCmd cmd
+    Just cmd -> processCmd cmd opts
 
-processCmd :: Command -> IO ()
-processCmd Serve = Server.main
-processCmd cmd = withLocalDatabase $ \database ->
+processCmd :: Command -> Options -> IO ()
+processCmd Serve _ = Server.main
+processCmd cmd opts = withLocalDatabase $ \database ->
   case cmd of
     Add passedArgs -> do
       let newDoc = buildDocument passedArgs
       update database (AddDocument newDoc)
-    Search qs ->
-      query database (SearchDocuments qs) >>= display
+    Search qs -> do
+      let op = optSearchOperator opts
+      query database (SearchDocuments qs (show op)) >>= display
     Sync -> do
       documents <- query database AllDocuments
       doSync documents database
