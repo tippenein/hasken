@@ -60,5 +60,7 @@ selectDocuments userKey = do
 
 insertDocument :: Document -> IO Document
 insertDocument doc = do
-  runDB $ insert_ doc
-  return doc
+  d <- runDB $ insertUnique doc
+  case d of
+    Nothing -> return doc
+    Just _ -> return doc
