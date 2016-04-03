@@ -17,6 +17,7 @@ type DocumentAPI =
 
 type ListDocuments =
      "documents"
+  :> Capture "user_key" Text
   :> Get '[JSON] [Document]
 
 type CreateDocument =

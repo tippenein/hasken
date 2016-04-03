@@ -46,6 +46,7 @@ data HaskenConfig = HaskenConfig
 data RemoteConfig = RemoteConfig
   { domain :: String
   , port   :: Int
+  , userKey :: String
   } deriving (Show, Generic, FromJSON)
 
 data LocalConfig = LocalConfig

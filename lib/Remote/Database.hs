@@ -26,17 +26,25 @@ import Data.Text                    (Text)
 import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH
+import System.Environment (getEnv)
 import GHC.Generics                 (Generic)
 import Remote.Config
 import Servant.Server               (ServantErr)
 
-runOnDb name = runSqlite name
-runDB = runOnDb "hasken.dev.db"
 
-persistValue (Entity _ v) = v
+runDB = runSqlite "hasken.dev.db"
+
+envDb = do
+  e <- getEnv "HASKEN_ENV"
+  case e of
+    "dev"  -> return "hasken.dev.db"
+    "test" -> return "hasken.test.db"
+    "prod" -> return "hasken.db"
+    _      -> return "hasken.dev.db"
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Document json
+    userKey Text
     title Text
     content Text
     tags [Text]
@@ -44,10 +52,10 @@ Document json
     deriving Eq Show Generic
 |]
 
-selectDocuments :: IO [Document]
-selectDocuments = do
-  docs <- runDB $ selectList [] []
-  return $ map persistValue docs
+selectDocuments :: Text -> IO [Document]
+selectDocuments userKey = do
+  docs <- runDB $ selectList [DocumentUserKey ==. userKey] []
+  return $ map entityVal docs
 
 
 insertDocument :: Document -> IO Document

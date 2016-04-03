@@ -20,7 +20,7 @@ server =
        listDocuments
   :<|> createDocument
 
-listDocuments = liftIO Database.selectDocuments
+listDocuments userKey = liftIO $ Database.selectDocuments userKey
 
 createDocument doc = liftIO $ Database.insertDocument doc
 
