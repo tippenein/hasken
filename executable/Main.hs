@@ -22,19 +22,11 @@ import qualified Remote.Main         as Server
 $(makeAcidic ''Database [
   'addDocument,
   'viewDocuments,
-  'searchDocuments
+  'searchDocuments,
+  'hardUpdate,
+  'allDocuments
   ])
 
-
-upsert docs database = undefined
-  -- fmap (\doc -> update database (AddDocument (fromDatabaseDoc doc))) docs
-
-doSync localDocs database = do
-  mapM_ createDoc localDocs
-  remoteDocs <- Client.listDocuments
-  -- upsert remoteDocs database
-  createCheckpoint database
-  putStrLn $ "synced: " ++ show remoteDocs
 
 display :: [Document] -> IO ()
 display docs = do
@@ -132,13 +124,24 @@ processCmd cmd = withLocalDatabase $ \database ->
     Search qs ->
       query database (SearchDocuments qs) >>= display
     Sync -> do
-      documents <- query database (ViewDocuments 1000)
+      documents <- query database AllDocuments
       doSync documents database
-    Serve -> Server.main
+    Serve -> closeAcidState database >> Server.main
     List i ->
       case i of
         Nothing -> query database (ViewDocuments 10) >>= display
         Just n -> query database (ViewDocuments (read n :: Int)) >>= display
+
+addNew remoteDocs database = update database (HardUpdate docs')
+  where
+    docs' = map fromDatabaseDoc remoteDocs
+
+doSync localDocs database = do
+  mapM_ createDoc localDocs
+  remoteDocs <- Client.listDocuments
+  addNew remoteDocs database
+  createCheckpoint database
+  putStrLn $ "synced: " ++ show remoteDocs
 
 main :: IO ()
 main = execParser parserOpts >>= run
