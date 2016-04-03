@@ -106,10 +106,21 @@ withLocalDatabase = Exception.bracket openDb closeAcidState
       loc <- localStorageLocation
       openLocalStateFrom loc (Database [])
 
+showHelpText :: ParserPrefs -> ParserInfo a -> IO ()
+showHelpText pprefs pinfo = handleParseResult . Failure $
+  parserFailure pprefs pinfo ShowHelpText mempty
+
+defaultPrefs = ParserPrefs
+      { prefMultiSuffix = ""
+      , prefDisambiguate = False
+      , prefShowHelpOnError = False
+      , prefBacktrack = True
+      , prefColumns = 80 }
+
 run' :: Options -> IO ()
 run' opts =
   case optCommand opts of
-    Nothing -> error "should not reach this"
+    Nothing -> showHelpText defaultPrefs parserOpts
     Just cmd -> processCmd cmd
 
 processCmd :: Command -> IO ()
@@ -130,11 +141,11 @@ processCmd cmd = withLocalDatabase $ \database ->
         Just n -> query database (ViewDocuments (read n :: Int)) >>= display
 
 main :: IO ()
-main = execParser opts >>= run
-  where
-    opts =
-      info (helper <*> optParser)
-      ( fullDesc
-      <> progDesc "tagged local storage with a sync option"
-      <> header "create and tag documents for searchable recall"
-      )
+main = execParser parserOpts >>= run
+
+parserOpts =
+  info (helper <*> optParser)
+  ( fullDesc
+  <> progDesc "tagged local storage with a sync option"
+  <> header "create and tag documents for searchable recall"
+  )
