@@ -55,6 +55,8 @@ instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
   getCopy = contain $ Document <$> safeGet <*> safeGet <*> safeGet
 
+hardUpdate :: [Document] -> Update Database ()
+hardUpdate docs = put $ Database docs
 
 addDocument :: Document -> Update Database ()
 addDocument doc = do
@@ -66,6 +68,11 @@ removeDocument doc = do
   Database documents <- get
   let withoutDoc = filter (/= doc) documents
   put (Database withoutDoc)
+
+allDocuments :: Query Database [Document]
+allDocuments = do
+  Database documents <- ask
+  return documents
 
 viewDocuments :: Int -> Query Database [Document]
 viewDocuments limit = do
