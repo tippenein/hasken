@@ -56,7 +56,6 @@ instance SafeCopy Document where
   getCopy = contain $ Document <$> safeGet <*> safeGet <*> safeGet
 
 
--- Transactions are defined to run in either the 'Update' or 'Query' monad
 addDocument :: Document -> Update Database ()
 addDocument doc = do
   Database documents <- get

@@ -12,8 +12,7 @@
 {-# LANGUAGE TypeFamilies               #-}
 
 module Remote.Database
-  (
-    insertDocument
+  ( insertDocument
   , selectDocuments
   , Document(..)
   , runDB
