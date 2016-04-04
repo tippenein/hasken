@@ -2,6 +2,7 @@
 remote:
   domain: deltadrome.us
   port: 8081
+  userKey: aadd25e0-563f-4bd5-bcc8-86e833104789
 
 # local store options
 local:

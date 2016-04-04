@@ -50,6 +50,7 @@ Available commands:
 remote:
   host: somesite.com
   port: 8082
+  userKey: <some guid>
 local:
   showTags: false
 ```
