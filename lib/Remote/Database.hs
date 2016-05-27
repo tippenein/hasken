@@ -26,14 +26,17 @@ import Data.Text                    (Text)
 import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH
-import System.Environment (getEnv)
 import GHC.Generics                 (Generic)
 import Remote.Config
 import Servant.Server               (ServantErr)
+import System.Environment           (getEnv)
 
 
-runDB = runSqlite "hasken.dev.db"
+runDB q = do
+  d <- liftIO envDb
+  runSqlite d q
 
+envDb :: IO Text
 envDb = do
   e <- getEnv "HASKEN_ENV"
   case e of
