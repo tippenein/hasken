@@ -116,6 +116,7 @@ run' opts =
     Just cmd -> processCmd cmd
 
 processCmd :: Command -> IO ()
+processCmd Serve = Server.main
 processCmd cmd = withLocalDatabase $ \database ->
   case cmd of
     Add passedArgs -> do
@@ -126,7 +127,6 @@ processCmd cmd = withLocalDatabase $ \database ->
     Sync -> do
       documents <- query database AllDocuments
       doSync documents database
-    Serve -> closeAcidState database >> Server.main
     List i ->
       case i of
         Nothing -> query database (ViewDocuments 10) >>= display
