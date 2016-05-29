@@ -40,7 +40,6 @@ envDb :: IO Text
 envDb = do
   e <- getEnv "HASKEN_ENV"
   case e of
-    "dev"  -> return "hasken.dev.db"
     "test" -> return "hasken.test.db"
     "prod" -> return "hasken.db"
     _      -> return "hasken.dev.db"
@@ -60,10 +59,16 @@ selectDocuments userKey = do
   docs <- runDB $ selectList [DocumentUserKey ==. userKey] []
   return $ map entityVal docs
 
-
 insertDocument :: Document -> IO Document
-insertDocument doc = do
-  d <- runDB $ insertUnique doc
+insertDocument o = do
+  d <- runDB $ insertBy o
   case d of
-    Nothing -> return doc
-    Just _ -> return doc
+    Left _ -> putStrLn "record already exists" >> return o
+    Right _ -> putStrLn "inserted record" >> return o
+
+-- insertDb :: a -> IO a
+-- insertDb o = do
+--   d <- runDB $ insertBy o
+--   case d of
+--     Left _ -> putStrLn "record already exists" >> return o
+--     Right _ -> putStrLn "inserted record" >> return o
