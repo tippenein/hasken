@@ -7,21 +7,53 @@ Hasken you shall receive
 
 Easily searchable local document store with option to push to server for backup
 
-use it for:
-  - storing links to gifs
-  - recipes
-  - notes
-  - store your pins and passwords (once clientside encryption is implemented)
+Your documents are titled, tagged and stored locally.
 
-all tagged and searchable from the commandline
-
-##Setup
+## Setup
 
 `stack install`
 
 `cp hasken.yml.sample ~/.hasken.yml`
 
-##Usage
+
+## Usage
+
+```
+hasken add shia-magic shia,gif,magic,whatever http://reactiongifs.me/wp-content/uploads/2013/08/shia-labeouf-magic-gif.gif
+```
+
+For an explanation of commands
+
+```
+hasken add --help                                                                                                                                                                                                    bmo@bmos-MacBook-Air-4
+Usage: hasken add Title Tag1,Tag2 Content and stuff
+  Add a document to the local storage
+
+  Available options:
+    -h,--help                Show this help text
+```
+
+And searchable from the commandline
+
+```
+hasken search magic
+> shia-magic -> http://reactiongifs.me/wp-content/uploads/2013/08/shia-labeouf-magic-gif.gif
+   ~~|  shia gif magic whatever
+```
+
+Syncing to/from server
+
+```
+hasken sync
+```
+
+use it for:
+  - storing links to gifs
+  - recipes
+  - notes
+  - etc..
+
+## Help
 
 ```
 $ hasken -h
@@ -55,11 +87,15 @@ local:
   showTags: false
 ```
 
-###remote:
+Feel free to run your own instance of the server with `hasken serve` or connect to a public one with these settings
+```
+  domain: deltadrome.us
+  port: 8009
+```
+
+### remote:
 The `sync` option will only push items which are not present on the server, and pull items
 the server has exclusively.
 
-###local:
+### local:
 The `showTags` yaml attribute can be overridden by the `--show-tags` flag in any command that displays documents
-
-
