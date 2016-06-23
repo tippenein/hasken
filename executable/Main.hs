@@ -141,7 +141,7 @@ doSync localDocs database = do
   remoteDocs <- Client.listDocuments
   addNew remoteDocs database
   createCheckpoint database
-  putStrLn $ "synced: " ++ show remoteDocs
+  putStrLn $ "synced successfully " ++ show (length remoteDocs) ++ " documents"
 
 main :: IO ()
 main = execParser parserOpts >>= run

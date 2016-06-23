@@ -3,11 +3,11 @@ Hasken
 
 [![Build Status](https://travis-ci.org/tippenein/hasken.svg?branch=master)](https://travis-ci.org/tippenein/hasken)
 
-Hasken you shall receive
-
 Easily searchable local document store with option to push to server for backup
 
 Your documents are titled, tagged and stored locally.
+
+> Hasken you shall receive
 
 ## Setup
 
@@ -80,7 +80,7 @@ Available commands:
 ```yaml
 # file: ~/.hasken.yml
 remote:
-  host: somesite.com
+  domain: somesite.com
   port: 8082
   userKey: <some guid>
 local:
@@ -88,9 +88,9 @@ local:
 ```
 
 Feel free to run your own instance of the server with `hasken serve` or connect to a public one with these settings
-```
-  domain: deltadrome.us
-  port: 8009
+```yaml
+domain: deltadrome.us
+port: 8009
 ```
 
 ### remote:
