@@ -23,10 +23,11 @@ import System.IO               (stdout)
 import Text.PrettyPrint.Leijen (displayIO, displayS, linebreak, list, putDoc,
                                 renderPretty, sep, text, (<+>))
 
-data Document = Document { title   :: String
-                         , content :: String
-                         , tags    :: [String]
-                         } deriving (Eq, Ord, Typeable, ToJSON, FromJSON, Generic)
+data Document = Document
+  { title   :: String
+  , content :: String
+  , tags    :: [String]
+  } deriving (Eq, Ord, Typeable, ToJSON, FromJSON, Generic)
 
 data Database = Database [Document]
 
@@ -36,6 +37,7 @@ displayDoc = putDoc . mainDoc
 displayDocWithTags d = renderWidth 1000 (mainDoc d <+> tagDocs d)
 
 renderWidth w x = displayIO stdout (renderPretty 0.4 w x)
+
 mainDoc d =
   text (title d) <+>
   text "->" <+>
@@ -43,10 +45,9 @@ mainDoc d =
   linebreak
 
 tagDocs d =
-  text "  ~~| " <+>
+  text "  tags| " <+>
   sep (fmap text (tags d)) <+>
   linebreak
-
 
 instance Show Document where
   show (Document title content tags) = title ++ " - " ++ content
@@ -72,26 +73,25 @@ removeDocument doc = do
 allDocuments :: Query Database [Document]
 allDocuments = do
   Database documents <- ask
-  return documents
+  pure documents
 
 viewDocuments :: Int -> Query Database [Document]
 viewDocuments limit = do
   Database documents <- ask
-  return (take limit documents)
+  pure (take limit documents)
 
 searchDocuments :: [String] -> Query Database [Document]
 searchDocuments queries = do
   Database documents <- ask
-  return $ searchDoc queries documents
+  pure (searchDoc queries documents)
 
 searchDoc :: [String] -> [Document] -> [Document]
-searchDoc queries =
-  filter filterDoc
-    where
-      filterDoc document =
-        overQueries (title document) queries ||
-        overQueries (content document) queries ||
-        any (\a -> overQueries a queries) (tags document)
+searchDoc queries = filter filterDoc
+  where
+    filterDoc document =
+      overQueries (title document) queries ||
+      overQueries (content document) queries ||
+      any (\a -> overQueries a queries) (tags document)
 
 overQueries :: String -> [String] -> Bool
 overQueries content searches = any (\search -> search `isInfixOf` content) searches
