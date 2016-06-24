@@ -23,10 +23,11 @@ import System.IO               (stdout)
 import Text.PrettyPrint.Leijen (displayIO, displayS, linebreak, list, putDoc,
                                 renderPretty, sep, text, (<+>))
 
-data Document = Document { title   :: String
-                         , content :: String
-                         , tags    :: [String]
-                         } deriving (Eq, Ord, Typeable, ToJSON, FromJSON, Generic)
+data Document = Document
+  { title   :: String
+  , content :: String
+  , tags    :: [String]
+  } deriving (Eq, Ord, Typeable, ToJSON, FromJSON, Generic)
 
 data Database = Database [Document]
 
@@ -36,6 +37,7 @@ displayDoc = putDoc . mainDoc
 displayDocWithTags d = renderWidth 1000 (mainDoc d <+> tagDocs d)
 
 renderWidth w x = displayIO stdout (renderPretty 0.4 w x)
+
 mainDoc d =
   text (title d) <+>
   text "->" <+>
@@ -43,13 +45,18 @@ mainDoc d =
   linebreak
 
 tagDocs d =
-  text "  ~~| " <+>
+  text "  tags| " <+>
   sep (fmap text (tags d)) <+>
   linebreak
 
+data SearchOperator = Or | And
+  deriving (Show, Eq, Typeable)
+
+deriveSafeCopySimple 1 'base ''SearchOperator
 
 instance Show Document where
   show (Document title content tags) = title ++ " - " ++ content
+
 
 instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags
@@ -72,31 +79,31 @@ removeDocument doc = do
 allDocuments :: Query Database [Document]
 allDocuments = do
   Database documents <- ask
-  return documents
+  pure documents
 
 viewDocuments :: Int -> Query Database [Document]
 viewDocuments limit = do
   Database documents <- ask
-  return (take limit documents)
+  pure (take limit documents)
 
-searchDocuments :: [String] -> String -> Query Database [Document]
+searchDocuments :: [String] -> SearchOperator -> Query Database [Document]
 searchDocuments queries op = do
   Database documents <- ask
-  return $ searchDoc queries op documents
+  pure (searchDoc queries op documents)
 
-searchDoc :: [String] -> String -> [Document] -> [Document]
-searchDoc queries op =
-  filter (filterDoc queries op)
+searchDoc :: [String] -> SearchOperator -> [Document] -> [Document]
+searchDoc queries op = filter (filterDoc queries op)
 
+filterDoc :: [String] -> SearchOperator -> Document -> Bool
 filterDoc queries op document =
   case op of
-    "And" -> a && b && (all c (tags document))
-    "Or" -> a || b || (any c (tags document))
+    And -> a && b && (all c (tags document))
+    Or -> a || b || (any c (tags document))
 
   where
     a = overQueries (title document) queries
     b = overQueries (content document) queries
-    c = (\a -> overQueries a queries)
+    c = \a -> overQueries a queries
 
 overQueries :: String -> [String] -> Bool
 overQueries content searches = any (\search -> search `isInfixOf` content) searches

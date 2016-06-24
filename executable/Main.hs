@@ -5,6 +5,7 @@ module Main where
 
 import qualified Control.Exception   as Exception
 import           Data.Acid
+import           Data.Foldable
 import           Data.Maybe          (fromMaybe)
 import qualified Data.Text           as T
 import qualified Data.Text.IO        as T
@@ -32,8 +33,8 @@ display :: [Document] -> IO ()
 display docs = do
   showTagsSetting <- showTags <$> localConfig
   if showTagsSetting
-     then mapM_ displayDocWithTags docs
-     else mapM_ displayDoc docs
+     then traverse_ displayDocWithTags docs
+     else traverse_ displayDoc docs
 
 showTagsParser :: Parser Bool
 showTagsParser =
@@ -75,9 +76,6 @@ commandParser = optional $ subparser $
   <> command "sync" (pure Sync `withInfo` "sync with the remote")
   <> command "serve" (pure Serve `withInfo` "serve an instance of the remote component")
 
-data SearchOperator = Or | And
-  deriving (Show, Eq)
-
 data Options
   = Options
   { optShowVersion    :: Bool
@@ -99,6 +97,7 @@ run opts =
   if optShowVersion opts
   then showVersion
   else run' opts
+
 
 showVersion = putStrLn $ "Version " <> Version.showVersion Meta.version
 
@@ -127,7 +126,7 @@ processCmd cmd opts = withLocalDatabase $ \database ->
       update database (AddDocument newDoc)
     Search qs -> do
       let op = optSearchOperator opts
-      query database (SearchDocuments qs (show op)) >>= display
+      query database (SearchDocuments qs op) >>= display
     Sync -> do
       documents <- query database AllDocuments
       doSync documents database
@@ -138,10 +137,10 @@ processCmd cmd opts = withLocalDatabase $ \database ->
 
 addNew remoteDocs database = update database (HardUpdate docs')
   where
-    docs' = map fromDatabaseDoc remoteDocs
+    docs' = fmap fromDatabaseDoc remoteDocs
 
 doSync localDocs database = do
-  mapM_ createDoc localDocs
+  traverse_ createDoc localDocs
   remoteDocs <- Client.listDocuments
   addNew remoteDocs database
   createCheckpoint database
