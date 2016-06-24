@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Hasken by tippenein</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Hasken</h1>
+        <p>easily searchable index of local data</p>
+
+        <p class="view"><a href="https://github.com/tippenein/hasken">View the Project on GitHub <small>tippenein/hasken</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/tippenein/hasken/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/tippenein/hasken/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/tippenein/hasken">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h2>
+<a id="hasken" class="anchor" href="#hasken" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hasken</h2>
+
+<p><a href="https://travis-ci.org/tippenein/hasken"><img src="https://travis-ci.org/tippenein/hasken.svg?branch=master" alt="Build Status"></a></p>
+
+<p>Easily searchable local document store with option to push to server for backup</p>
+
+<p>Your documents are titled, tagged and stored locally.</p>
+
+<blockquote>
+<p>Hasken you shall receive</p>
+</blockquote>
+
+<h2>
+<a id="setup" class="anchor" href="#setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup</h2>
+
+<p><code>stack install</code></p>
+
+<p><code>cp hasken.yml.sample ~/.hasken.yml</code></p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<pre><code>hasken add shia-magic shia,gif,magic,whatever http://reactiongifs.me/wp-content/uploads/2013/08/shia-labeouf-magic-gif.gif
+</code></pre>
+
+<p>For an explanation of commands</p>
+
+<pre><code>hasken add --help                                                                                                                                                                                                    bmo@bmos-MacBook-Air-4
+Usage: hasken add Title Tag1,Tag2 Content and stuff
+  Add a document to the local storage
+
+  Available options:
+    -h,--help                Show this help text
+</code></pre>
+
+<p>And searchable from the commandline</p>
+
+<pre><code>hasken search magic
+&gt; shia-magic -&gt; http://reactiongifs.me/wp-content/uploads/2013/08/shia-labeouf-magic-gif.gif
+   ~~|  shia gif magic whatever
+</code></pre>
+
+<p>Syncing to/from server</p>
+
+<pre><code>hasken sync
+</code></pre>
+
+<p>use it for:</p>
+
+<ul>
+<li>storing links to gifs</li>
+<li>recipes</li>
+<li>notes</li>
+<li>etc..</li>
+</ul>
+
+<h2>
+<a id="help" class="anchor" href="#help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Help</h2>
+
+<pre><code>$ hasken -h
+create and tag documents for searchable recall
+
+Usage: hasken [--version] [--show-tags] [COMMAND]
+  tagged local storage with a sync option
+
+Available options:
+  -h,--help                Show this help text
+  --version                Show version and exit
+  --show-tags              show tags when displaying documents
+
+Available commands:
+  add                      Add a document to the local storage
+  search                   search the local docs
+  list                     list local docs (defaults to limit 10)
+  sync                     sync with the remote
+  serve                    serve an instance of the remote component
+</code></pre>
+
+<h2>
+<a id="config" class="anchor" href="#config" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Config</h2>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-c"># file: ~/.hasken.yml</span>
+<span class="pl-s"><span class="pl-ent">remote:</span></span>
+  <span class="pl-s"><span class="pl-ent">domain:</span> <span class="pl-s">somesite.com</span></span>
+  <span class="pl-c1"><span class="pl-ent">port:</span> 8082</span>
+  <span class="pl-s"><span class="pl-ent">userKey:</span> <span class="pl-s">&lt;some guid&gt;</span></span>
+<span class="pl-s"><span class="pl-ent">local:</span></span>
+  <span class="pl-s"><span class="pl-ent">showTags:</span> <span class="pl-c1">false</span></span></pre></div>
+
+<p>Feel free to run your own instance of the server with <code>hasken serve</code> or connect to a public one with these settings</p>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-s"><span class="pl-ent">domain:</span> <span class="pl-s">deltadrome.us</span></span>
+<span class="pl-c1"><span class="pl-ent">port:</span> 8009</span></pre></div>
+
+<h3>
+<a id="remote" class="anchor" href="#remote" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>remote:</h3>
+
+<p>The <code>sync</code> option will only push items which are not present on the server, and pull items
+the server has exclusively.</p>
+
+<h3>
+<a id="local" class="anchor" href="#local" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>local:</h3>
+
+<p>The <code>showTags</code> yaml attribute can be overridden by the <code>--show-tags</code> flag in any command that displays documents</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/tippenein">tippenein</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
