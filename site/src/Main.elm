@@ -6,42 +6,10 @@ import String
 import Json.Decode exposing (..)
 import Json.Decode.Extra exposing (..)
 import Maybe as Maybe
+import Document exposing (..)
 
 main =
   Html.beginnerProgram { model = model, view = view, update = update }
-
--- genericDecode decoder payload =
---   case decodeValue decoder payload of
---     Ok val -> val
---     Err message -> genericError message
-
--- -- TODO: fix this
--- genericError msg = {}
-
--- decodeDocuments : Value -> List Document
--- decodeDocuments payload = genericDecode documentsDecoder payload
-
--- decodeDocument : Value -> Document
--- decodeDocument payload = genericDecode documentDecoder payload
-
-
--- documentsDecoder : Decoder (List Document)
--- documentsDecoder = Json.Decode.list documentDecoder
-
--- documentDecoder : Decoder Document
--- documentDecoder =
---   succeed Document
---     |: ("name" := string)
---     |: ("id" := int)
-
--- MODEL
-
-type alias Document =
-  { id : Int
-  , title : String
-  , content : String
-  , tags : List String
-  }
 
 type alias Model =
   { documents : List Document
@@ -64,7 +32,7 @@ update : Msg -> Model -> Model
 update msg model =
   case msg of
     Search term ->
-      { model | documents = List.filter (\document -> String.contains term document.title) fetchDocuments }
+      { model | documents = List.filter (\document -> String.contains term document.title || String.contains term document.content) fetchDocuments }
 
 -- VIEW
 
@@ -76,7 +44,7 @@ documentListStyle =
     [ ("list-style", "none")
     ]
 
-documentListElement d = Html.li [] [text d.title]
+documentListElement d = Html.li [] [text (d.title ++ " - " ++ d.content ++ " | ")]
 
 view : Model -> Html Msg
 view model =
