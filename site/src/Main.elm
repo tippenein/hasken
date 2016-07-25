@@ -1,38 +1,62 @@
 import Html exposing (Html, Attribute, div, input, text)
 import Html.App as Html
+import Http as Http
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
 import String
-import Json.Decode exposing (..)
+import Json.Decode as Json -- exposing (..)
 import Json.Decode.Extra exposing (..)
 import Maybe as Maybe
 import Document exposing (..)
+import Task exposing (..)
+import Html.App exposing (..)
 
-main =
-  Html.beginnerProgram { model = model, view = view, update = update }
+main = Html.App.program
+  { init = model ! [fetchDocuments]
+  , update = update
+  , view = view
+  , subscriptions = \_ -> Sub.none
+  }
 
 type alias Model =
   { documents : List Document
+  , message : String
   }
+
+userKey = "b4be5a63-eb40-439b-a2f3-ff480bd87884"
 
 model : Model
 model =
-  { documents = fetchDocuments }
+  { documents = [], message = "" }
 
-fetchDocuments : List Document
-fetchDocuments = --- decodeDocuments """[ {name: whatever, id: 1}, {name: derp, id: 2}]"""
-  [Document 1 "whatever" "blah blah" ["derp"], Document 2 "derp" "stuff" ["tag1", "tag2"]]
+fetchDocuments : Cmd Action
+fetchDocuments =
+  Http.get (Json.list jdecDocument) ("http://localhost:8080/documents/" ++ userKey)
+    |> Task.mapError toString
+    |> Task.perform ErrorOccurred DocumentsFetched
 
 -- UPDATE
 
-type Msg
-  = Search String
+type Action
+  = NoOp
+  | FetchDocuments
+  | ErrorOccurred String
+  | DocumentsFetched (List Document)
+  -- | Search String
 
-update : Msg -> Model -> Model
-update msg model =
-  case msg of
-    Search term ->
-      { model | documents = List.filter (\document -> String.contains term document.title || String.contains term document.content) fetchDocuments }
+update : Action -> Model -> (Model, Cmd Action)
+update action model =
+  case action of
+    -- Search term ->
+    --   { model | documents = List.filter (\document -> String.contains term document.title || String.contains term document.content) fetchDocuments }
+    NoOp ->
+      model ! []
+    FetchDocuments ->
+      { model | message = "Initiating data fetch!" } ! [fetchDocuments]
+    ErrorOccurred errorMessage ->
+      { model | message = "Oops! An error occurred: " ++ errorMessage } ! []
+    DocumentsFetched documents ->
+      { model | documents = documents, message = "The data has been fetched!" } ! []
 
 -- VIEW
 
@@ -46,9 +70,11 @@ documentListStyle =
 
 documentListElement d = Html.li [] [text (d.title ++ " - " ++ d.content ++ " | ")]
 
-view : Model -> Html Msg
+view : Model -> Html Action
 view model =
   div []
-    [ input [ placeholder "search documents", onInput Search ] []
+    [
+      div [] [ text model.message ]
+    , Html.button [ onClick FetchDocuments ] [ text "search documents" ]
     , documentList model.documents
     ]
