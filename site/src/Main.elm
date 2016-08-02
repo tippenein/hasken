@@ -27,7 +27,9 @@ userKey = "b4be5a63-eb40-439b-a2f3-ff480bd87884"
 
 model : Model
 model =
-  { documents = [], message = "" }
+  { documents = []
+  , message = ""
+  }
 
 fetchDocuments : Cmd Action
 fetchDocuments =
@@ -68,13 +70,18 @@ documentListStyle =
     [ ("list-style", "none")
     ]
 
-documentListElement d = Html.li [] [text (d.title ++ " - " ++ d.content ++ " | ")]
+
+documentListElement d =
+  Html.span [] [
+    text d.title, text d.content
+  ]
+
 
 view : Model -> Html Action
 view model =
   div []
     [
       div [] [ text model.message ]
-    , Html.button [ onClick FetchDocuments ] [ text "search documents" ]
+    , Html.input [ onClick FetchDocuments ] [ text "search documents" ]
     , documentList model.documents
     ]

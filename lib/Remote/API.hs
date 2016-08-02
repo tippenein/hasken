@@ -1,15 +1,26 @@
-{-# LANGUAGE DataKinds     #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Remote.API where
 
+import Data.Aeson
 import Data.Proxy
-import Data.Text       (Text)
+import Data.Text               (Text)
+import Database.Persist.Sqlite
 import Remote.Database
 import Servant.API
 
 documentAPI :: Proxy DocumentAPI
 documentAPI = Proxy
+
+
+instance FromJSON Document where
+instance FromJSON (Entity Document) where
+   parseJSON = entityIdFromJSON
+   -- parseJSON obj@(Object v) =  Entity <$> v .:  "id" <*> parseJSON obj
 
 type DocumentAPI =
        ListDocuments
@@ -18,10 +29,10 @@ type DocumentAPI =
 type ListDocuments =
      "documents"
   :> Capture "user_key" Text
-  :> Get '[JSON] [Document]
+  :> Get '[JSON] [Entity Document]
 
 type CreateDocument =
      "documents"
   :> ReqBody '[JSON] Document
-  :> Post '[JSON] Document
+  :> Post '[JSON] (Entity Document)
 
