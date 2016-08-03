@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Remote.Client where
 
+import Control.Monad.Trans.Except (ExceptT, runExceptT)
+import Network.HTTP.Client (Manager, newManager, defaultManagerSettings)
 import Control.Monad.IO.Class     (liftIO)
-import Control.Monad.Trans.Either
 import Servant                    hiding (host)
 import Servant.Client             hiding (host)
 import System.IO.Unsafe           (unsafePerformIO)
@@ -11,14 +12,6 @@ import Data.Text as T
 import qualified Config
 import Remote.API
 
-type Action a = EitherT ServantError IO a
-
-run :: Action a -> IO a
-run action = do
-  result <- runEitherT action
-  case result of
-    Left message -> error (show message)
-    Right x -> return x
 
 {-# NOINLINE ukey #-}
 ukey = unsafePerformIO $ Config.userKey <$> Config.remoteConfig
@@ -27,10 +20,23 @@ makeBaseUrl :: IO BaseUrl
 makeBaseUrl = do
   h <- Config.domain <$> Config.remoteConfig
   p <- Config.port <$> Config.remoteConfig
-  return $ BaseUrl Http h p
+  pure $ BaseUrl Http h p ""
+
+type Action a = ExceptT ServantError IO a
+
+run action = do
+  baseUrl <- makeBaseUrl
+  manager <- newManager defaultManagerSettings
+  result <- runExceptT $ action manager baseUrl
+  case result of
+    Left message -> error (show message)
+    Right x -> pure x
 
 listDocuments' :<|> createDocument' =
-  client documentAPI (unsafePerformIO makeBaseUrl)
+  client documentAPI
+
+listDocumentsWith client_id = run $ listDocuments' client_id
 
 listDocuments = run $ listDocuments' (T.pack ukey)
+
 createDocument doc = run $ createDocument' doc

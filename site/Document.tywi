@@ -1,8 +1,8 @@
 module Document;
 
 type Document{
+   id : Int;
    title : String;
-   userKey : String;
    content : String;
    tags : List<String>;
 }

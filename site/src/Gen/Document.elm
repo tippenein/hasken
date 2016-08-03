@@ -9,8 +9,8 @@ import Json.Decode exposing ((:=))
 import Json.Encode as JE
 
 type alias Document  =
-   { title : String
-   , userKey : String
+   { id : Int
+   , title : String
    , content : String
    , tags : (List String)
    }
@@ -19,16 +19,16 @@ jencDocument : Document  -> JE.Value
 jencDocument = JE.object << jencTuplesDocument
 jencTuplesDocument : Document  -> List (String, JE.Value)
 jencTuplesDocument  x =
-    [ ("title", JE.string x.title)
-    , ("userKey", JE.string x.userKey)
+    [ ("id", JE.int x.id)
+    , ("title", JE.string x.title)
     , ("content", JE.string x.content)
     , ("tags", (JE.list << L.map (JE.string)) x.tags)
     ]
 jdecDocument : JD.Decoder (Document )
 jdecDocument =
+    ("id" := JD.int) `JD.andThen` \j_id -> 
     ("title" := JD.string) `JD.andThen` \j_title -> 
-    ("userKey" := JD.string) `JD.andThen` \j_userKey -> 
     ("content" := JD.string) `JD.andThen` \j_content -> 
     ("tags" := JD.list (JD.string)) `JD.andThen` \j_tags -> 
-    JD.succeed (Document j_title j_userKey j_content j_tags)
+    JD.succeed (Document j_id j_title j_content j_tags)
 

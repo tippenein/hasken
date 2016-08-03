@@ -104,12 +104,12 @@ showHelpText :: ParserPrefs -> ParserInfo a -> IO ()
 showHelpText pprefs pinfo = handleParseResult . Failure $
   parserFailure pprefs pinfo ShowHelpText mempty
 
-defaultPrefs = ParserPrefs
-      { prefMultiSuffix = ""
-      , prefDisambiguate = False
-      , prefShowHelpOnError = False
-      , prefBacktrack = True
-      , prefColumns = 80 }
+-- defaultPrefs = ParserPrefs
+--       { prefMultiSuffix = ""
+--       , prefDisambiguate = False
+--       , prefShowHelpOnError = False
+--       , prefBacktrack = True
+--       , prefColumns = 80 }
 
 run' :: Options -> IO ()
 run' opts =
