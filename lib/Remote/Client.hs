@@ -35,8 +35,8 @@ run action = do
 listDocuments' :<|> createDocument' =
   client documentAPI
 
-listDocumentsWith client_id = run $ listDocuments' client_id
+listDocumentsWith client_id mq = run $ listDocuments' client_id mq
 
-listDocuments = run $ listDocuments' (T.pack ukey)
+listDocuments mq = run $ listDocuments' (T.pack ukey) mq
 
 createDocument doc = run $ createDocument' doc

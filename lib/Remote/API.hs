@@ -29,6 +29,7 @@ type DocumentAPI =
 type ListDocuments =
      "documents"
   :> Capture "user_key" Text
+  :> QueryParam "q" Text
   :> Get '[JSON] [Entity Document]
 
 type CreateDocument =

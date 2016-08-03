@@ -71,10 +71,13 @@ instance ToJSON (Entity Document) where
     ]
 
 
-selectDocuments :: Text -> IO [Entity Document]
-selectDocuments userKey = do
+-- TODO: Fix tag querying to use Esqueleto or something NOT IN-MEMORY
+selectDocuments :: Text -> Maybe Text -> IO [Entity Document]
+selectDocuments userKey query = do
   docs <- runDB $ selectList [DocumentUserKey ==. userKey] []
-  return docs
+  case query of
+    Nothing -> pure docs
+    Just q -> pure $ filter (\a -> q `elem` documentTags (entityVal a)) docs
 
 insertDocument :: Document -> IO (Entity Document)
 insertDocument o = do

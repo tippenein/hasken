@@ -140,7 +140,7 @@ addNew remoteDocs database = update database (HardUpdate docs')
 
 doSync localDocs database = do
   traverse_ createDoc localDocs
-  remoteDocs <- Client.listDocuments
+  remoteDocs <- Client.listDocuments Nothing
   addNew remoteDocs database
   createCheckpoint database
   putStrLn $ "synced successfully " ++ show (length remoteDocs) ++ " documents"
