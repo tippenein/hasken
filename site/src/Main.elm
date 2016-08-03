@@ -1,13 +1,11 @@
-import Html exposing (Html, Attribute, div, input, text)
-import Html.App as Html
 import Http as Http
-import String
-import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onClick)
 import Json.Decode as Json -- exposing (..)
-import Document exposing (..)
 import Task exposing (..)
 import Html.App exposing (..)
+import Html exposing (Html, div)
+
+import Document exposing (..)
+import Component exposing (..)
 
 main : Program Never
 main = Html.App.program
@@ -20,6 +18,7 @@ main = Html.App.program
 type alias Model =
   { documents : List Document
   , message : String
+  , queryString : String
   }
 
 userKey = "b4be5a63-eb40-439b-a2f3-ff480bd87884"
@@ -28,7 +27,16 @@ model : Model
 model =
   { documents = []
   , message = ""
+  , queryString = ""
   }
+
+searchDocuments : String -> Cmd Action
+searchDocuments q =
+    let url = Http.url ("http://localhost:8099/documents/" ++ userKey) [ ("q", q) ]
+    in
+      Http.get (Json.list jdecDocument) url
+        |> Task.mapError toString
+        |> Task.perform ErrorOccurred DocumentsFetched
 
 fetchDocuments : Cmd Action
 fetchDocuments =
@@ -41,15 +49,15 @@ fetchDocuments =
 type Action
   = NoOp
   | FetchDocuments
+  | Search String
   | ErrorOccurred String
   | DocumentsFetched (List Document)
-  -- | Search String
 
 update : Action -> Model -> (Model, Cmd Action)
 update action model =
   case action of
-    -- Search term ->
-    --   { model | documents = List.filter (\document -> String.contains term document.title || String.contains term document.content) fetchDocuments }
+    Search term ->
+      { model | message = "searching " ++ term} ! [searchDocuments term]
     NoOp ->
       model ! []
     FetchDocuments ->
@@ -61,30 +69,11 @@ update action model =
 
 -- VIEW
 
-documentList ds =
-  Html.ul [ documentListStyle ] (List.map documentListElement ds)
-
-documentListStyle =
-  style
-    [ ("list-style", "none")
-    ]
-
-
-documentListElement d =
-  Html.li [] [
-    text (d.title ++ " - "), decorateContent d.content
-  ]
-
-decorateContent c =
-    if String.contains "http" c then Html.a [href c] [text c]
-    else text c
-                              
-
 view : Model -> Html Action
 view model =
   div []
     [
-      div [] [ text model.message ]
-    , Html.input [ onClick FetchDocuments ] [ text "search documents" ]
+      statusMessage model
+    , searchBox model Search
     , documentList model.documents
     ]

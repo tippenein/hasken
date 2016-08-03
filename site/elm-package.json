@@ -4,8 +4,9 @@
     "repository": "https://github.com/tippenein/whatever.git",
     "license": "BSD3",
     "source-directories": [
-        "src",
-        "src/Gen"
+        "src"
+      , "src/Gen"
+      , "src/components"
     ],
     "exposed-modules": [],
     "dependencies": {
