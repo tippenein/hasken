@@ -18,7 +18,7 @@ source-repository head
 
 library
   hs-source-dirs:      lib
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
   exposed-modules:
       Local
     , Remote
@@ -30,6 +30,9 @@ library
     , Remote.Database
     , Remote.Server
     , Remote.Main
+  other-modules:
+      Remote.Config
+    , Paths_hasken
   build-depends:
       base
     , acid-state
@@ -40,9 +43,10 @@ library
     , mtl
     , safecopy
     , resourcet
-    , servant >= 0.4
-    , servant-client >= 0.4
-    , servant-server >= 0.4
+    , servant >= 0.7
+    , servant-client >= 0.7
+    , servant-server >= 0.7
+    , http-client
     , split
     , text
     , monad-logger

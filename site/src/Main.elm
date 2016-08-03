@@ -1,16 +1,15 @@
 import Html exposing (Html, Attribute, div, input, text)
 import Html.App as Html
 import Http as Http
+import String
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
-import String
 import Json.Decode as Json -- exposing (..)
-import Json.Decode.Extra exposing (..)
-import Maybe as Maybe
 import Document exposing (..)
 import Task exposing (..)
 import Html.App exposing (..)
 
+main : Program Never
 main = Html.App.program
   { init = model ! [fetchDocuments]
   , update = update
@@ -33,7 +32,7 @@ model =
 
 fetchDocuments : Cmd Action
 fetchDocuments =
-  Http.get (Json.list jdecDocument) ("http://localhost:8080/documents/" ++ userKey)
+  Http.get (Json.list jdecDocument) ("http://localhost:8099/documents/" ++ userKey)
     |> Task.mapError toString
     |> Task.perform ErrorOccurred DocumentsFetched
 
@@ -72,10 +71,14 @@ documentListStyle =
 
 
 documentListElement d =
-  Html.span [] [
-    text d.title, text d.content
+  Html.li [] [
+    text (d.title ++ " - "), decorateContent d.content
   ]
 
+decorateContent c =
+    if String.contains "http" c then Html.a [href c] [text c]
+    else text c
+                              
 
 view : Model -> Html Action
 view model =
