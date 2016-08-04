@@ -3,7 +3,6 @@ import Json.Decode as Json -- exposing (..)
 import Task exposing (..)
 import Html.App exposing (..)
 import Html exposing (Html, div)
-
 import Document exposing (..)
 import Component exposing (..)
 
@@ -16,8 +15,7 @@ main = Html.App.program
   }
 
 type alias Model =
-  { documents : List Document
-  , message : String
+  { documents : Either String (List Document)
   , queryString : String
   }
 
@@ -25,24 +23,30 @@ userKey = "b4be5a63-eb40-439b-a2f3-ff480bd87884"
 
 model : Model
 model =
-  { documents = []
-  , message = ""
+  { documents = Right []
   , queryString = ""
   }
 
+baseUrl = "http://localhost:8099"
+
 searchDocuments : String -> Cmd Action
 searchDocuments q =
-    let url = Http.url ("http://localhost:8099/documents/" ++ userKey) [ ("q", q) ]
+    if q == "" then getDocs Nothing else getDocs (Just [ ("q", q) ])
+
+fetchDocuments : Cmd Action
+fetchDocuments =
+    getDocs Nothing
+
+getDocs : Maybe (List (String, String)) -> Cmd Action
+getDocs mquery_params =
+    let url = case mquery_params of
+                  Just q -> Http.url docUrl q
+                  Nothing -> Http.url docUrl []
+        docUrl = baseUrl ++ "/documents/" ++ userKey
     in
       Http.get (Json.list jdecDocument) url
         |> Task.mapError toString
         |> Task.perform ErrorOccurred DocumentsFetched
-
-fetchDocuments : Cmd Action
-fetchDocuments =
-  Http.get (Json.list jdecDocument) ("http://localhost:8099/documents/" ++ userKey)
-    |> Task.mapError toString
-    |> Task.perform ErrorOccurred DocumentsFetched
 
 -- UPDATE
 
@@ -57,15 +61,15 @@ update : Action -> Model -> (Model, Cmd Action)
 update action model =
   case action of
     Search term ->
-      { model | message = "searching " ++ term} ! [searchDocuments term]
+      { model | queryString = term} ! [searchDocuments term]
     NoOp ->
       model ! []
     FetchDocuments ->
-      { model | message = "Initiating data fetch!" } ! [fetchDocuments]
+      model ! [fetchDocuments]
     ErrorOccurred errorMessage ->
-      { model | message = "Oops! An error occurred: " ++ errorMessage } ! []
+      { model | documents = Left("Oops! An error occurred: " ++ errorMessage) } ! []
     DocumentsFetched documents ->
-      { model | documents = documents, message = "The data has been fetched!" } ! []
+      { model | documents = Right(documents) } ! []
 
 -- VIEW
 
@@ -73,7 +77,7 @@ view : Model -> Html Action
 view model =
   div []
     [
-      statusMessage model
+      statusMessage model.documents
     , searchBox model Search
     , documentList model.documents
     ]

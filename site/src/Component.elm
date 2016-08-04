@@ -3,16 +3,26 @@ module Component exposing (..)
 import Html.Attributes exposing (..)
 import Html exposing (Html, Attribute, div, input, text)
 import Html.Events exposing (onInput)
-import String
 import Regex as Regex
 
-statusMessage model = div [] [ text model.message ]
+type Either a b
+    = Left a
+    | Right b
+
+
+statusMessage edocs =
+    case edocs of
+        Left msg -> div [class "warning-box"] [ text msg ]
+        Right _ -> div [] []
 
 documentList ds =
-    let chunked = List.sortWith preferLink ds
+    case ds of
+        Left _ -> div [] []
+        Right docs -> 
+          let chunked = List.sortWith preferLink docs
 
-    in
-      div [ ] (List.map documentListElement chunked)
+          in
+            div [ ] (List.map documentListElement chunked)
 
 preferLink a b =
     case ((isImage a.content), (isImage b.content)) of
@@ -20,7 +30,6 @@ preferLink a b =
         (True, True) -> EQ
         (False, False) -> EQ
         (False, True) -> LT
-
 
 titleStyle =
   style
@@ -40,7 +49,6 @@ documentImageStyle =
     , ("white-space", "nowrap")
     ]
 
-
 documentListElement d =
     let styl = if isImage(d.content) then documentImageStyle else documentLinkStyle
     in
@@ -57,11 +65,12 @@ decorateContent d =
     else text d.content
 
 isUrl c = Regex.contains (Regex.regex "^https?://") c
-isImage c = Regex.contains (Regex.regex "(jpg|gif|png)$") c
+isImage c = Regex.contains (Regex.regex "(jpg|gif|png|:large)$") c
 
 searchBox model action =
   Html.input [
-        type' "search"
+        class "u-full-width search-box"
+      , type' "search"
       , placeholder "search.."
       , onInput action
       , value model.queryString

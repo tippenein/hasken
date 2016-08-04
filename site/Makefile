@@ -3,3 +3,9 @@ gen:
 
 build:
 	elm package install
+
+html:
+	elm make src/Main.elm
+
+js:
+	elm make src/Main.elm --output=elm.js
