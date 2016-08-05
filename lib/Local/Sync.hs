@@ -8,8 +8,10 @@ import Database.Persist.Sqlite
 import System.IO.Unsafe (unsafePerformIO)
 import Config
 
+uKey :: String
 uKey = unsafePerformIO $ userKey <$> remoteConfig
 
+createDoc :: Document -> IO (Entity DB.Document)
 createDoc d = Client.createDocument doc
   where
     doc = DB.Document {

@@ -7,6 +7,7 @@ import           Remote.Database         (migrateAll, runDB)
 import           Remote.Server           (runServer)
 import           System.Environment      (getEnv)
 
+main :: IO ()
 main = do
   runDB $ runMigration migrateAll
 

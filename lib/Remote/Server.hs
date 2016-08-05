@@ -1,17 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Remote.Server (runServer) where
 
-import Control.Monad.IO.Class               (liftIO)
-import Control.Monad.Trans.Either
-import Data.Text
+import Control.Monad.IO.Class               (liftIO, MonadIO)
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Cors          (simpleCors)
 import Network.Wai.Middleware.RequestLogger (logStdout)
 import Servant
 
+import Data.Text
 import Remote.API                           as API
-import Remote.Config
 import Remote.Database                      as Database
 
 
@@ -20,10 +18,13 @@ server =
        listDocuments
   :<|> createDocument
 
+listDocuments :: MonadIO m => Text -> Maybe Text -> m [Database.Entity Document]
 listDocuments userKey mq = liftIO $ Database.selectDocuments userKey mq
 
+createDocument :: MonadIO m => Document -> m (Entity Document)
 createDocument doc = liftIO $ Database.insertDocument doc
 
+middlewares :: Application -> Application
 middlewares = simpleCors . logStdout
 
 app :: Application

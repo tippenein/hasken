@@ -65,6 +65,8 @@ library
 executable hasken
   hs-source-dirs:      executable
   main-is:             Main.hs
+  other-modules:
+      Paths_hasken
   build-depends:
       base -any
     , hasken -any
@@ -81,6 +83,7 @@ test-suite hasken-test
   other-modules:
       Spec.RemoteSpec
     , Spec.LocalSpec
+    , Paths_hasken
   build-depends:
       base
     , hasken -any

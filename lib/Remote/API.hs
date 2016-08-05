@@ -17,7 +17,7 @@ documentAPI :: Proxy DocumentAPI
 documentAPI = Proxy
 
 
-instance FromJSON Document where
+instance FromJSON Document
 instance FromJSON (Entity Document) where
   parseJSON = entityIdFromJSON
   -- parseJSON obj@(Object v) =  Entity <$> v .:  "id" <*> parseJSON obj

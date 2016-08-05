@@ -6,13 +6,9 @@ module Main where
 import qualified Control.Exception   as Exception
 import           Data.Acid
 import           Data.Foldable
-import           Data.Maybe          (fromMaybe)
-import qualified Data.Text           as T
-import qualified Data.Text.IO        as T
 import qualified Data.Version        as Version
 import           Options.Applicative
 import qualified Paths_hasken        as Meta
-import           System.Environment  (getArgs, getEnv)
 
 import           Config
 import           Local.Document
@@ -138,6 +134,7 @@ addNew remoteDocs database = update database (HardUpdate docs')
   where
     docs' = fmap fromDatabaseDoc remoteDocs
 
+doSync :: Foldable t => t Document -> AcidState Database -> IO ()
 doSync localDocs database = do
   traverse_ createDoc localDocs
   remoteDocs <- Client.listDocuments Nothing
@@ -148,6 +145,7 @@ doSync localDocs database = do
 main :: IO ()
 main = execParser parserOpts >>= run
 
+parserOpts :: ParserInfo Options
 parserOpts =
   info (helper <*> optParser)
   ( fullDesc

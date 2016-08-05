@@ -17,19 +17,15 @@ module Remote.Database
   , Document(..)
   , runDB
   , migrateAll
+  , Entity
   ) where
 
 import Control.Monad.IO.Class       (liftIO)
-import Control.Monad.Trans.Resource
 import Data.Aeson
-import Data.Int                     (Int64)
 import Data.Text                    (Text)
-import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH
 import GHC.Generics                 (Generic)
-import Remote.Config
-import Servant.Server               (ServantErr)
 import System.Environment           (getEnv)
 
 
@@ -41,9 +37,9 @@ envDb :: IO Text
 envDb = do
   e <- getEnv "HASKEN_ENV"
   case e of
-    "test" -> return "hasken.test.db"
-    "prod" -> return "hasken.db"
-    _      -> return "hasken.dev.db"
+    "test" -> pure "hasken.test.db"
+    "prod" -> pure "hasken.db"
+    _      -> pure "hasken.dev.db"
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Document
