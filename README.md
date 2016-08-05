@@ -1,7 +1,7 @@
 Hasken
 ----
 
-[![Build Status](https://travis-ci.org/tippenein/hasken.svg?branch=master)](https://travis-ci.org/tippenein/hasken)
+[![Build Status](https://circleci.com/gh/tippenein/hasken.svg?style=shield&circle-token=9180dafb43d4f7aa728dd5c3cb0a30a57d48ccb7)](https://circleci.com/gh/tippenein/hasken)
 
 Easily searchable local document store with option to push to server for backup
 
