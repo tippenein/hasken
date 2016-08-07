@@ -27,7 +27,7 @@ model =
   , queryString = ""
   }
 
-baseUrl = "http://localhost:8099"
+baseUrl = "http://deltadrome.us/hasken/api"
 
 searchDocuments : String -> Cmd Action
 searchDocuments q =

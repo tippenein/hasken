@@ -11,12 +11,16 @@ import Servant
 import Data.Text
 import Remote.API                           as API
 import Remote.Database                      as Database
+import Remote.Markdown as Markdown
 
 
 server :: Server DocumentAPI
-server =
-       listDocuments
-  :<|> createDocument
+server = apiServer :<|> home :<|> assets
+  where
+    home = pure Markdown.homePage
+    assets = serveDirectory "frontend/dist"
+
+apiServer = listDocuments :<|> createDocument
 
 listDocuments :: MonadIO m => Text -> Maybe Text -> m [Database.Entity Document]
 listDocuments userKey mq = liftIO $ Database.selectDocuments userKey mq

@@ -17,22 +17,15 @@ source-repository head
   location: git://github.com/tippenein/hasken.git
 
 library
-  hs-source-dirs:      lib
+  hs-source-dirs:      cli
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
   exposed-modules:
       Local
-    , Remote
     , Config
     , Local.Document
     , Local.Sync
-    , Remote.API
-    , Remote.Client
-    , Remote.Database
-    , Remote.Server
-    , Remote.Main
   other-modules:
-      Remote.Config
-    , Paths_hasken
+      Paths_hasken
   build-depends:
       base
     , acid-state
@@ -42,6 +35,37 @@ library
     , filepath
     , mtl
     , safecopy
+    , resourcet
+    , servant >= 0.7
+    , servant-client >= 0.7
+    , http-client
+    , split
+    , text
+    , monad-logger
+    , transformers
+    , wl-pprint
+    , yaml
+  default-language:    Haskell2010
+
+library
+  hs-source-dirs:      backend
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
+  exposed-modules:
+      Remote
+    , Remote.API
+    , Remote.Client
+    , Remote.Database
+    , Remote.Server
+    , Remote.Main
+  other-modules:
+      Remote.Config
+  build-depends:
+      base
+    , aeson
+    , directory
+    , either
+    , filepath
+    , mtl
     , resourcet
     , servant >= 0.7
     , servant-client >= 0.7
@@ -73,6 +97,18 @@ executable hasken
     , text
     , optparse-applicative
     , acid-state
+  default-language:    Haskell2010
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+
+executable hasken-server
+  hs-source-dirs:      executable
+  main-is:             Main.hs
+  other-modules:
+      Paths_hasken
+  build-depends:
+      base -any
+    , hasken -any
+    , text
   default-language:    Haskell2010
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
 

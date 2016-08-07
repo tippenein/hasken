@@ -1,0 +1,86 @@
+name:                hasken-server
+version:             0.3.1
+cabal-version:       >=1.10
+build-type:          Simple
+synopsis:            remote storage of hasken documents
+license:             BSD3
+license-file:        LICENSE
+homepage:            https://github.com/tippenein/hasken
+bug-reports:         https://github.com/tippenein/hasken/issues
+author:              brady.ouren
+maintainer:          brady.ouren@gmail.com
+copyright:           2015 brady.ouren <brady.ouren@gmail.com>
+extra-source-files:  README.md
+
+source-repository head
+  type:     git
+  location: git://github.com/tippenein/hasken.git
+
+library
+  hs-source-dirs:      src
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
+  exposed-modules:
+      Markdown
+    , Remote
+    , Remote.API
+    , Remote.Client
+    , Remote.Database
+    , Remote.Server
+  build-depends:
+      base
+    , aeson
+    , directory
+    , either
+    , filepath
+    , mtl
+    , resourcet
+    , servant >= 0.7
+    , servant-client >= 0.7
+    , servant-server >= 0.7
+    , servant-lucid >= 0.5
+    , http-client
+    , split
+    , text
+    , monad-logger
+    , transformers
+    , persistent
+    , persistent-template
+    , persistent-sqlite
+    , warp
+    , wai
+    , wai-extra
+    , wai-cors
+    , wl-pprint
+    , yaml
+  default-language:    Haskell2010
+
+executable hasken-server
+  hs-source-dirs:      executable
+  main-is:             Main.hs
+  -- other-modules:
+  --     Paths_hasken
+  build-depends:
+      base -any
+    , hasken-server -any
+    , text
+  default-language:    Haskell2010
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+
+test-suite hasken-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  other-modules:
+      Spec.ServerSpec
+  build-depends:
+      base
+    , hasken -any
+    , hspec ==2.*
+    , hspec-wai
+    , hspec-wai-json
+    , directory
+    , HUnit -any
+    , QuickCheck -any
+  default-language:    Haskell2010
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+
