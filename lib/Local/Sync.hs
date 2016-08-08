@@ -1,25 +1,21 @@
 module Local.Sync where
 
-import           Data.Text       (pack, unpack)
-import           Local.Document  (Document (..))
-import qualified Remote.Client   as Client
-import qualified Remote.Database as DB
-import Database.Persist.Sqlite
-import System.IO.Unsafe (unsafePerformIO)
-import Config
-
-uKey :: String
-uKey = unsafePerformIO $ userKey <$> remoteConfig
+import           Data.Text               (pack, unpack)
+import           Database.Persist.Sqlite
+import           HaskenConfig
+import           Local.Document          (Document (..))
+import qualified Remote.Client           as Client
+import qualified Remote.Database         as DB
 
 createDoc :: Document -> IO (Entity DB.Document)
-createDoc d = Client.createDocument doc
-  where
-    doc = DB.Document {
-        DB.documentUserKey = pack $ uKey
+createDoc d = do
+  u <- userKey <$> remoteConfig
+  Client.createDocument(DB.Document {
+        DB.documentUserKey = pack u
       , DB.documentTitle = pack $ title d
       , DB.documentContent = pack $ content d
       , DB.documentTags = fmap pack (tags d)
-      }
+      })
 
 fromDatabaseDoc :: Entity DB.Document -> Document
 fromDatabaseDoc (Entity _ d) = Document {

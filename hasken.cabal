@@ -22,7 +22,7 @@ library
   exposed-modules:
       Local
     , Remote
-    , Config
+    , HaskenConfig
     , Local.Document
     , Local.Sync
     , Remote.API

@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric  #-}
 
-module Config where
+module HaskenConfig where
 
 import Data.Aeson       (FromJSON)
 import Data.Text        (Text)
@@ -44,8 +44,8 @@ data HaskenConfig = HaskenConfig
   } deriving (Show, Generic, FromJSON)
 
 data RemoteConfig = RemoteConfig
-  { domain :: String
-  , port   :: Int
+  { domain  :: String
+  , port    :: Int
   , userKey :: String
   } deriving (Show, Generic, FromJSON)
 

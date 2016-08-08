@@ -1,20 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Remote.Client where
 
-import Control.Monad.Trans.Except (ExceptT, runExceptT)
-import Network.HTTP.Client (Manager, newManager, defaultManagerSettings)
-import Control.Monad.IO.Class     (liftIO)
-import Servant                    hiding (host)
-import Servant.Client             hiding (host)
-import System.IO.Unsafe           (unsafePerformIO)
-import Data.Text as T
+import           Control.Monad.Trans.Except (ExceptT, runExceptT)
+import           Data.Text                  as T
+import           Network.HTTP.Client        (defaultManagerSettings,
+                                             newManager)
+import           Servant
+import           Servant.Client
 
-import qualified Config
-import Remote.API
+import qualified HaskenConfig               as Config
+import           Remote.API
 
 
-{-# NOINLINE ukey #-}
-ukey = unsafePerformIO $ Config.userKey <$> Config.remoteConfig
+ukey :: IO String
+ukey = Config.userKey <$> Config.remoteConfig
 
 makeBaseUrl :: IO BaseUrl
 makeBaseUrl = do
@@ -37,6 +36,8 @@ listDocuments' :<|> createDocument' =
 
 listDocumentsWith client_id mq = run $ listDocuments' client_id mq
 
-listDocuments mq = run $ listDocuments' (T.pack ukey) mq
+listDocuments mq = do
+  u <- T.pack <$> ukey
+  run $ listDocuments' u mq
 
 createDocument doc = run $ createDocument' doc

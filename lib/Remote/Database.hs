@@ -20,13 +20,13 @@ module Remote.Database
   , Entity
   ) where
 
-import Control.Monad.IO.Class       (liftIO)
+import Control.Monad.IO.Class  (liftIO)
 import Data.Aeson
-import Data.Text                    (Text)
+import Data.Text               (Text)
 import Database.Persist.Sqlite
 import Database.Persist.TH
-import GHC.Generics                 (Generic)
-import System.Environment           (getEnv)
+import GHC.Generics            (Generic)
+import System.Environment      (getEnv)
 
 
 runDB q = do
@@ -51,6 +51,10 @@ Document
     deriving Eq Show Generic
 |]
 
+instance FromJSON Document
+instance FromJSON (Entity Document) where
+  parseJSON = entityIdFromJSON
+
 instance ToJSON Document where
   toJSON (Document _ t c ts) = object
     [ "title" .= t
@@ -65,7 +69,6 @@ instance ToJSON (Entity Document) where
     , "content" .= c
     , "tags" .= ts
     ]
-
 
 -- TODO: Fix tag querying to use Esqueleto or something NOT IN-MEMORY
 selectDocuments :: Text -> Maybe Text -> IO [Entity Document]

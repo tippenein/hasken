@@ -8,7 +8,6 @@
 
 module Local.Document where
 
-import Control.Applicative     ((<$>), (<*>))
 import Control.Monad.Reader    (ask)
 import Control.Monad.State     (get, put)
 import Data.Acid
@@ -16,11 +15,10 @@ import Data.Aeson
 import Data.List               (isInfixOf)
 import Data.List.Split         (splitOn)
 import Data.SafeCopy
-import Data.Text               (Text)
 import Data.Typeable
 import GHC.Generics
 import System.IO               (stdout)
-import Text.PrettyPrint.Leijen (displayIO, displayS, linebreak, list, putDoc,
+import Text.PrettyPrint.Leijen (Doc, displayIO, linebreak, putDoc,
                                 renderPretty, sep, text, (<+>))
 
 data Document = Document
@@ -33,24 +31,30 @@ data Database = Database [Document]
 
 deriveSafeCopy 0 'base ''Database
 
+displayDoc :: Document -> IO ()
 displayDoc = putDoc . mainDoc
+
+displayDocWithTags :: Document -> IO ()
 displayDocWithTags d = renderWidth 1000 (mainDoc d <+> tagDocs d)
 
+renderWidth :: Int -> Doc -> IO ()
 renderWidth w x = displayIO stdout (renderPretty 0.4 w x)
 
+mainDoc :: Document -> Doc
 mainDoc d =
   text (title d) <+>
   text "->" <+>
   text (content d) <+>
   linebreak
 
+tagDocs :: Document -> Text.PrettyPrint.Leijen.Doc
 tagDocs d =
   text "  tags| " <+>
   sep (fmap text (tags d)) <+>
   linebreak
 
 instance Show Document where
-  show (Document title content tags) = title ++ " - " ++ content
+  show (Document title content _) = title ++ " - " ++ content
 
 instance SafeCopy Document where
   putCopy Document{..} = contain $ do safePut title; safePut content; safePut tags

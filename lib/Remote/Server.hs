@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Remote.Server (runServer) where
 
-import Control.Monad.IO.Class               (liftIO, MonadIO)
+import Control.Monad.IO.Class               (MonadIO, liftIO)
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Network.Wai.Middleware.Cors          (simpleCors)

@@ -10,7 +10,7 @@ import qualified Data.Version        as Version
 import           Options.Applicative
 import qualified Paths_hasken        as Meta
 
-import           Config
+import           HaskenConfig
 import           Local.Document
 import           Local.Sync          (createDoc, fromDatabaseDoc)
 import qualified Remote.Client       as Client
@@ -88,8 +88,10 @@ run opts =
   else run' opts
 
 
+showVersion :: IO ()
 showVersion = putStrLn $ "Version " <> Version.showVersion Meta.version
 
+withLocalDatabase :: (AcidState Database -> IO ()) -> IO ()
 withLocalDatabase = Exception.bracket openDb closeAcidState
   where
     openDb = do
