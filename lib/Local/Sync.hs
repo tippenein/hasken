@@ -19,7 +19,7 @@ createDoc d = do
 
 fromDatabaseDoc :: Entity DB.Document -> Document
 fromDatabaseDoc (Entity _ d) = Document {
-  title = unpack $ DB.documentTitle d,
-  content = unpack $ DB.documentContent d,
-  tags = fmap unpack (DB.documentTags d)
+    title = unpack $ DB.documentTitle d,
+    content = unpack $ DB.documentContent d,
+    tags = fmap unpack (DB.documentTags d)
   }

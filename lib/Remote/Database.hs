@@ -51,20 +51,28 @@ Document
     deriving Eq Show Generic
 |]
 
-instance FromJSON Document
+instance FromJSON Document where
+  parseJSON = withObject "document" $ \o -> do
+    documentUserKey <- o .:  "userKey"
+    documentTitle <- o .:  "title"
+    documentContent <- o .: "content"
+    documentTags <- o .: "tags"
+    pure Document{..}
 instance FromJSON (Entity Document) where
   parseJSON = entityIdFromJSON
 
 instance ToJSON Document where
-  toJSON (Document _ t c ts) = object
-    [ "title" .= t
+  toJSON (Document u t c ts) = object
+    [ "userKey" .= u
+    , "title" .= t
     , "content" .= c
     , "tags" .= ts
     ]
 
 instance ToJSON (Entity Document) where
-  toJSON (Entity pid (Document _ t c ts)) = object
-    [ "id" .= pid
+  toJSON (Entity pid (Document u t c ts)) = object
+    [ "userKey" .= u
+    , "id" .= pid
     , "title" .= t
     , "content" .= c
     , "tags" .= ts
