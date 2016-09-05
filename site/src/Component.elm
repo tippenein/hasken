@@ -27,9 +27,8 @@ documentList ds =
 preferLink a b =
     case ((isImage a.content), (isImage b.content)) of
         (True, False) -> GT
-        (True, True) -> EQ
-        (False, False) -> EQ
         (False, True) -> LT
+        _             -> EQ
 
 titleStyle =
   style
@@ -67,6 +66,17 @@ decorateContent d =
 isUrl c = Regex.contains (Regex.regex "^https?://") c
 isImage c = Regex.contains (Regex.regex "(jpg|gif|png|:large)$") c
 
+userKeyInput model action =
+  Html.input [
+        class "u-full-width search-box"
+      , type' "search"
+      , placeholder "user key input"
+      , onInput action
+      , value model.userKeyFocus
+    ]
+    []
+    -- genericInput model.userKeyFocus action "search" "user key"
+
 searchBox model action =
   Html.input [
         class "u-full-width search-box"
@@ -74,5 +84,15 @@ searchBox model action =
       , placeholder "search.."
       , onInput action
       , value model.queryString
+    ]
+    []
+
+genericInput model_attr action t p =
+  Html.input [
+        class "u-full-width search-box"
+      , type' t
+      , placeholder p
+      , onInput action
+      , value model_attr
     ]
     []
