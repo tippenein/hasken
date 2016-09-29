@@ -67,15 +67,16 @@ isUrl c = Regex.contains (Regex.regex "^https?://") c
 isImage c = Regex.contains (Regex.regex "(jpg|gif|png|:large)$") c
 
 userKeyInput model action =
-  Html.input [
-        class "u-full-width search-box"
-      , type' "search"
-      , placeholder "user key input"
-      , onInput action
-      , value model.userKeyFocus
-    ]
-    []
-    -- genericInput model.userKeyFocus action "search" "user key"
+  let styl = if model.userKeyFocus == "" then "hidden" else ""
+  in
+    Html.input [
+          class ("u-full-width search-box " ++ styl)
+        , type' "search"
+        , placeholder "user key"
+        , onInput action
+        , value model.userKeyFocus
+      ]
+      []
 
 searchBox model action =
   Html.input [

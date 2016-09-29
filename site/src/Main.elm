@@ -8,7 +8,7 @@ import Component exposing (..)
 
 main : Program Never
 main = Html.App.program
-  { init = model ! [fetchDocuments model]
+  { init = model ! []
   , update = update
   , view = view
   , subscriptions = \_ -> Sub.none
@@ -20,8 +20,6 @@ type alias Model =
   , userKeyFocus : String
   }
 
-userKey = "b4be5a63-eb40-439b-a2f3-ff480bd87884"
-
 model : Model
 model =
   { documents = Right []
@@ -29,22 +27,22 @@ model =
   , queryString = ""
   }
 
-baseUrl = "http://localhost:8080"
+baseUrl = "http://deltadrome.us/hasken/api"
 
-searchDocuments : Model -> String -> Cmd Action
+searchDocuments : String -> String -> Cmd Action
 searchDocuments m q =
     if q == "" then getDocs m Nothing else getDocs m (Just [ ("q", q) ])
 
-fetchDocuments : Model -> Cmd Action
-fetchDocuments m =
-    getDocs m Nothing
+fetchDocuments : String -> Cmd Action
+fetchDocuments uk =
+    getDocs uk Nothing
 
-getDocs : Model -> Maybe (List (String, String)) -> Cmd Action
-getDocs model mquery_params =
+getDocs : String -> Maybe (List (String, String)) -> Cmd Action
+getDocs uk mquery_params =
     let url = case mquery_params of
                   Just q -> Http.url docUrl q
                   Nothing -> Http.url docUrl []
-        docUrl = baseUrl ++ "/documents/" ++ model.userKeyFocus
+        docUrl = baseUrl ++ "/documents/" ++ uk
     in
       Http.get (Json.list jdecDocument) url
         |> Task.mapError toString
@@ -64,13 +62,13 @@ update : Action -> Model -> (Model, Cmd Action)
 update action model =
   case action of
     Search term ->
-      { model | queryString = term} ! [searchDocuments model term]
+      { model | queryString = term} ! [searchDocuments model.userKeyFocus term]
     NoOp ->
       model ! []
     InputUserKey u ->
-      { model | userKeyFocus = u } ! []
+      { model | userKeyFocus = u } ! [fetchDocuments u]
     FetchDocuments ->
-      model ! [fetchDocuments model]
+      model ! [fetchDocuments model.userKeyFocus]
     ErrorOccurred errorMessage ->
       { model | documents = Left("Oops! An error occurred: " ++ errorMessage) } ! []
     DocumentsFetched documents ->
