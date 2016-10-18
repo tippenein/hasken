@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
-    "summary": "stuff",
-    "repository": "https://github.com/tippenein/whatever.git",
+    "summary": "frontend for hasken backend",
+    "repository": "https://github.com/tippenein/hasken.git",
     "license": "BSD3",
     "source-directories": [
         "src"

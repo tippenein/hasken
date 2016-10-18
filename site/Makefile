@@ -1,3 +1,5 @@
+all:
+	gen build js
 gen:
 	twirec -e Document -i . --elm-out src/Gen --elm-version 0.17
 

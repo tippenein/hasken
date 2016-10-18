@@ -4,3 +4,10 @@ packages:
 extra-deps: []
 flags: {}
 extra-package-dbs: []
+
+image:
+  container:
+    name: tippenein/hasken
+    base: fpco/stack-run
+    add:
+      frontend: /app/site

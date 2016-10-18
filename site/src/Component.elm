@@ -18,7 +18,7 @@ statusMessage edocs =
 documentList ds =
     case ds of
         Left _ -> div [] []
-        Right docs -> 
+        Right docs ->
           let chunked = List.sortWith preferLink docs
 
           in
@@ -67,7 +67,8 @@ isUrl c = Regex.contains (Regex.regex "^https?://") c
 isImage c = Regex.contains (Regex.regex "(jpg|gif|png|:large)$") c
 
 userKeyInput model action =
-  let styl = if model.userKeyFocus == "" then "hidden" else ""
+  let styl = if activated then "" else "hidden"
+      activated = model.userKeyFocus == "" && model.queryString == ""
   in
     Html.input [
           class ("u-full-width search-box " ++ styl)
@@ -79,14 +80,17 @@ userKeyInput model action =
       []
 
 searchBox model action =
-  Html.input [
-        class "u-full-width search-box"
-      , type' "search"
-      , placeholder "search.."
-      , onInput action
-      , value model.queryString
-    ]
-    []
+  let styl = if activated then "" else "hidden"
+      activated = model.userKeyFocus /= "" && List.isEmpty model.documents
+  in
+    Html.input [
+          class ("u-full-width search-box " ++ styl)
+        , type' "search"
+        , placeholder "search.."
+        , onInput action
+        , value model.queryString
+      ]
+      []
 
 genericInput model_attr action t p =
   Html.input [
