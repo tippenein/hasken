@@ -15,16 +15,18 @@ main = Html.App.program
   }
 
 type alias Model =
-  { documents : Either String (List Document)
+  { documents : List Document
   , queryString : String
   , userKeyFocus : String
+  , errorMessage : String
   }
 
 model : Model
 model =
-  { documents = Right []
+  { documents = []
   , userKeyFocus = ""
   , queryString = ""
+  , errorMessage = ""
   }
 
 baseUrl = "http://0.0.0.0:8080"
@@ -70,9 +72,9 @@ update action model =
     FetchDocuments ->
       model ! [fetchDocuments model.userKeyFocus]
     ErrorOccurred errorMessage ->
-      { model | documents = Left("Oops! An error occurred: " ++ errorMessage) } ! []
+      { model | documents = [], errorMessage = "Oops! An error occurred: " ++ errorMessage } ! []
     DocumentsFetched documents ->
-      { model | documents = Right(documents) } ! []
+      { model | documents = documents } ! []
 
 -- VIEW
 
@@ -80,7 +82,7 @@ view : Model -> Html Action
 view model =
   div []
     [
-      statusMessage model.documents
+      statusMessage model.errorMessage
     , searchBox model Search
     , userKeyInput model InputUserKey
     , documentList model.documents

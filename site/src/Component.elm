@@ -10,15 +10,17 @@ type Either a b
     | Right b
 
 
-statusMessage edocs =
-    case edocs of
-        Left msg -> div [class "warning-box"] [ text msg ]
-        Right _ -> div [] []
+statusMessage msg =
+    if msg == ""
+    then
+        div [] []
+    else
+        div [class "warning-box"] [ text msg ]
 
-documentList ds =
-    case ds of
-        Left _ -> div [] []
-        Right docs ->
+documentList docs =
+    case docs of
+        [] -> div [] []
+        _ ->
           let chunked = List.sortWith preferLink docs
 
           in
@@ -81,7 +83,7 @@ userKeyInput model action =
 
 searchBox model action =
   let styl = if activated then "" else "hidden"
-      activated = model.userKeyFocus /= "" && List.isEmpty model.documents
+      activated = model.userKeyFocus /= "" -- && List.isEmpty model.documents
   in
     Html.input [
           class ("u-full-width search-box " ++ styl)
